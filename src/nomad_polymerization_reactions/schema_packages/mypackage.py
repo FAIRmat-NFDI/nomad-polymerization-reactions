@@ -79,11 +79,11 @@ class PolymerizationReaction(PublicationReference, Schema):
         logger.info(
             'PolymerizationReaction.normalize', parameter=configuration.parameter
         )
-        if self.extracted_json_data:
-            with open(self.extracted_json_data, 'r') as f:
-                extracted_json_data = f.read()
+        # if self.extracted_json_data:
+        #     with open(self.extracted_json_data, 'r') as f:
+        #         extracted_json_data = f.read()
 
-            self.DOI_number = extracted_json_data.get('source')
+        #     self.DOI_number = extracted_json_data.get('source')
 
 
 m_package.__init_metainfo__()

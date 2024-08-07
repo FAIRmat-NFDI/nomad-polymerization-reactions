@@ -13,7 +13,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "License :: OSI Approved :: Apache Software License",
 ]
-name = "nomad-nomad-polymerization-reactions"
+name = "nomad-polymerization-reactions"
 description = "Nomad example template"
 version = "0.1.0"
 readme = "README.md"
@@ -74,7 +74,7 @@ select = [
     "UP",
     # isort
     "I",
-    # pylint 
+    # pylint
     "PL",
 ]
 
@@ -109,9 +109,9 @@ where = ["src"]
 
 [project.entry-points.'nomad.plugin']
 
-mypackage = "nomad_nomad_polymerization_reactions.schema_packages:mypackage"
+mypackage = "nomad_polymerization_reactions.schema_packages:mypackage"
 
-myapp = "nomad_nomad_polymerization_reactions.apps:myapp"
+myapp = "nomad_polymerization_reactions.apps:myapp"
 [tool.cruft]
 # Avoid updating workflow files, this leads to permissions issues
 skip = [".github/*"]

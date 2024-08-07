@@ -6,8 +6,10 @@ class MySchemaPackageEntryPoint(SchemaPackageEntryPoint):
     parameter: int = Field(0, description='Custom configuration parameter')
 
     def load(self):
-        from nomad_nomad_polymerization_reactions.schema_packages.mypackage import m_package
- 
+        from nomad_nomad_polymerization_reactions.schema_packages.mypackage import (
+            m_package,
+        )
+
         return m_package
 
 

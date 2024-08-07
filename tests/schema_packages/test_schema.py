@@ -8,4 +8,6 @@ def test_schema():
     entry_archive = parse(test_file)[0]
     normalize_all(entry_archive)
 
-    assert entry_archive.data.message == 'Hello Markus!'
+    assert (
+        entry_archive.data.DOI_number == 'https://doi.org/10.1002/macp.1985.021860810'
+    )

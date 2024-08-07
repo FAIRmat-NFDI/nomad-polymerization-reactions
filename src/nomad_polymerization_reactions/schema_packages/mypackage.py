@@ -17,7 +17,7 @@ from nomad.metainfo import Quantity, SchemaPackage, SubSection, MEnum
 from nomad.datamodel.metainfo.basesections import PublicationReference
 
 configuration = config.get_plugin_entry_point(
-    'nomad_nomad_polymerization_reactions.schema_packages:mypackage'
+    'nomad_polymerization_reactions.schema_packages:mypackage'
 )
 
 m_package = SchemaPackage()

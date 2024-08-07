@@ -23,13 +23,13 @@ configuration = config.get_plugin_entry_point(
 m_package = SchemaPackage()
 
 
-class ReactionConstants(SubSection):
+class ReactionConstant(ArchiveSection):
     reaction_constant = Quantity(
-        type=float, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)
+        type=float, a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity)
     )
 
     reaction_constant_confi = Quantity(
-        type=float, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)
+        type=float, a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity)
     )
 
 
@@ -43,7 +43,7 @@ class ReactionConditions(ArchiveSection):
             'Step-growth',
             'Chain-growth',
         ),
-        a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.EnumEditQuantity),
     )
     solvent = Quantity(
         type=str, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)
@@ -54,12 +54,12 @@ class ReactionConditions(ArchiveSection):
     temperature = Quantity(
         type=float,
         unit='K',
-        a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
     determination_method = Quantity(
         type=str, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)
     )
-    reaction_constant = SubSection(section=ReactionConstants, repeats=True)
+    reaction_constants = SubSection(section_def=ReactionConstant, repeats=True)
 
 
 class PolymerizationReaction(PublicationReference, Schema):
@@ -70,8 +70,14 @@ class PolymerizationReaction(PublicationReference, Schema):
     )
 
     extracted_json_data = Quantity(
-        type=str, a_eln=ELNAnnotation(component=ELNComponentEnum.FileEditQuantity)
+        type=str,
+        description='Data file containing the extracted data.',
+        a_eln=ELNAnnotation(
+            component=ELNComponentEnum.FileEditQuantity,
+        ),
     )
+
+    reaction_conditions = SubSection(section_def=ReactionConditions, repeats=True)
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         super().normalize(archive, logger)

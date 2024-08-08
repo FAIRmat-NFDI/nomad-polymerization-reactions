@@ -15,7 +15,7 @@ from nomad.config import config
 from nomad.datamodel.data import ArchiveSection, Schema
 from nomad.datamodel.metainfo.annotations import ELNAnnotation, ELNComponentEnum
 from nomad.datamodel.metainfo.basesections import PublicationReference
-from nomad.metainfo import MEnum, Quantity, SchemaPackage, SubSection
+from nomad.metainfo import Quantity, SchemaPackage, SubSection
 
 configuration = config.get_plugin_entry_point(
     'nomad_polymerization_reactions.schema_packages:mypackage'

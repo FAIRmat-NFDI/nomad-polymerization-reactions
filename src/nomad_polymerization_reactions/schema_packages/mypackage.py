@@ -124,6 +124,7 @@ class PolymerizationReaction(PublicationReference, Schema):
                                     )
 
                             self.reaction_conditions.append(reaction_condition)
+        super().normalize(archive, logger)
 
 
 m_package.__init_metainfo__()

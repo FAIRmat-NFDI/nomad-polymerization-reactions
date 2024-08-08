@@ -36,15 +36,8 @@ class ReactionConstant(ArchiveSection):
 
 class ReactionConditions(ArchiveSection):
     polymerization_type = Quantity(
-        type=MEnum(
-            'free radical',
-            'Cationic',
-            'Coordination',
-            'Ring-opening',
-            'Step-growth',
-            'Chain-growth',
-        ),
-        a_eln=ELNAnnotation(component=ELNComponentEnum.EnumEditQuantity),
+        type=str,
+        a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity),
     )
     solvent = Quantity(
         type=str, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)

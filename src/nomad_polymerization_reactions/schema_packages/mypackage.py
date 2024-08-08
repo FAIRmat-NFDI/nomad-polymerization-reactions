@@ -10,11 +10,12 @@ if TYPE_CHECKING:
         BoundLogger,
     )
 
+import numpy as np
 from nomad.config import config
-from nomad.datamodel.data import Schema, ArchiveSection
+from nomad.datamodel.data import ArchiveSection, Schema
 from nomad.datamodel.metainfo.annotations import ELNAnnotation, ELNComponentEnum
-from nomad.metainfo import Quantity, SchemaPackage, SubSection, MEnum
 from nomad.datamodel.metainfo.basesections import PublicationReference
+from nomad.metainfo import MEnum, Quantity, SchemaPackage, SubSection
 
 configuration = config.get_plugin_entry_point(
     'nomad_polymerization_reactions.schema_packages:mypackage'
@@ -52,7 +53,7 @@ class ReactionConditions(ArchiveSection):
         type=str, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)
     )
     temperature = Quantity(
-        type=float,
+        type=np.dtype(np.float64),
         unit='K',
         a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
@@ -81,15 +82,55 @@ class PolymerizationReaction(PublicationReference, Schema):
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         super().normalize(archive, logger)
+        import json  # noqa: I001
+        from nomad.units import ureg  # noqa: I001
 
         logger.info(
             'PolymerizationReaction.normalize', parameter=configuration.parameter
         )
-        # if self.extracted_json_data:
-        #     with open(self.extracted_json_data, 'r') as f:
-        #         extracted_json_data = f.read()
+        if self.extracted_json_data:
+            with archive.m_context.raw_file(self.extracted_json_data) as file:
+                file_dict = json.load(file)
 
-        #     self.DOI_number = extracted_json_data.get('source')
+            print(file_dict)
+            self.DOI_number = file_dict.get('source')
+            if 'reactions' in file_dict:
+                for reaction in file_dict['reactions']:
+                    self.monomers = reaction.get('monomers', [])
+
+                    if 'reaction_conditions' in reaction:
+                        for condition in reaction['reaction_conditions']:
+                            reaction_condition = ReactionConditions(
+                                polymerization_type=condition.get(
+                                    'polymerization_type'
+                                ),
+                                solvent=condition.get('solvent'),
+                                method=condition.get('method'),
+                                temperature=np.float64(condition.get('temperature'))
+                                * ureg(condition['temperature_unit']),
+                                determination_method=condition.get(
+                                    'determination_method'
+                                ),
+                            )
+
+                            if (
+                                'reaction_constants' in condition
+                                and 'reaction_constant_conf' in condition
+                            ):
+                                constants = condition['reaction_constants']
+                                confs = condition['reaction_constant_conf']
+
+                                for const_key, const_value in constants.items():
+                                    reaction_constant = ReactionConstant()
+                                    reaction_constant.reaction_constant = const_value
+                                    reaction_constant.reaction_constant_confi = (
+                                        confs.get(f'constant_conf_{const_key[-1]}')
+                                    )
+                                    reaction_condition.reaction_constants.append(
+                                        reaction_constant
+                                    )
+
+                            self.reaction_conditions.append(reaction_condition)
 
 
 m_package.__init_metainfo__()

@@ -14,7 +14,10 @@ import numpy as np
 from nomad.config import config
 from nomad.datamodel.data import ArchiveSection, Schema
 from nomad.datamodel.metainfo.annotations import ELNAnnotation, ELNComponentEnum
-from nomad.datamodel.metainfo.basesections import PublicationReference
+from nomad.datamodel.metainfo.basesections import (
+    Activity,
+    PublicationReference,
+)
 from nomad.metainfo import Quantity, SchemaPackage, SubSection
 
 configuration = config.get_plugin_entry_point(
@@ -56,13 +59,17 @@ class ReactionConditions(ArchiveSection):
     reaction_constants = SubSection(section_def=ReactionConstant, repeats=True)
 
 
-class PolymerizationReaction(PublicationReference, Schema):
+class PolymerizationReaction(Activity, Schema):
     monomers = Quantity(
         type=str,
         shape=['*'],
         a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity),
     )
 
+    publication_reference = SubSection(
+        description='Reference to the publication containing the data.',
+        section_def=PublicationReference,
+    )
     extracted_json_data = Quantity(
         type=str,
         description='Data file containing the extracted data.',

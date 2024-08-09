@@ -16,6 +16,8 @@ from nomad.datamodel.data import ArchiveSection, Schema
 from nomad.datamodel.metainfo.annotations import ELNAnnotation, ELNComponentEnum
 from nomad.datamodel.metainfo.basesections import (
     Activity,
+    CompositeSystem,
+    PubChemPureSubstanceSection,
     PublicationReference,
 )
 from nomad.metainfo import Quantity, SchemaPackage, SubSection
@@ -60,12 +62,16 @@ class ReactionConditions(ArchiveSection):
 
 
 class PolymerizationReaction(Activity, Schema):
-    monomers = Quantity(
-        type=str,
-        shape=['*'],
-        a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity),
+    monomers = SubSection(
+        description='Monomers used in the polymerization reaction.',
+        section_def=PubChemPureSubstanceSection,
+        repeats=True,
     )
 
+    polymer = SubSection(
+        description='Polymer formed in the polymerization reaction.',
+        section_def=CompositeSystem,
+    )
     publication_reference = SubSection(
         description='Reference to the publication containing the data.',
         section_def=PublicationReference,
@@ -81,7 +87,12 @@ class PolymerizationReaction(Activity, Schema):
     reaction_conditions = SubSection(section_def=ReactionConditions, repeats=True)
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
+        if self.monomers is not None:
+            if self.polymer is None:
+                self.polymer = CompositeSystem()
+            self.polymer.components = self.monomers
         super().normalize(archive, logger)
+
         import json  # noqa: I001
         from nomad.units import ureg  # noqa: I001
 

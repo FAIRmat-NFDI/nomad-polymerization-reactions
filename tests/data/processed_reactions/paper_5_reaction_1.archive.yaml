@@ -1,0 +1,16 @@
+data:
+  extracted_json_data: paper_5.json
+  logP: 0.38710000000000006
+  m_def: nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction
+  monomers:
+  - smiles: C=C(C)C(=O)OC
+    substance_name: Methyl Methacrylate
+  - smiles: C=C(C)C(=O)O
+    substance_name: Methacrylic Acid
+  publication_reference:
+    DOI_number: https://doi.org/10.1016/0014-3057(94)00111-1
+  reaction_conditions:
+    method: solvent
+    solvent:
+      name: CC(C)O
+    temperature: 343.15

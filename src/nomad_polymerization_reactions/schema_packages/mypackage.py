@@ -44,9 +44,7 @@ class ReactionConditions(ArchiveSection):
         type=str,
         a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity),
     )
-    solvent = Quantity(
-        type=str, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)
-    )
+    solvent = SubSection(section_def=PubChemPureSubstanceSection)
     method = Quantity(
         type=str, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)
     )

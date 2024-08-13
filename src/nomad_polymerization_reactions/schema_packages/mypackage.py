@@ -19,6 +19,7 @@ from nomad.datamodel.metainfo.basesections import (
     CompositeSystem,
     PubChemPureSubstanceSection,
     PublicationReference,
+    PureSubstanceComponent,
 )
 from nomad.metainfo import Quantity, SchemaPackage, SubSection
 
@@ -59,13 +60,34 @@ class ReactionConditions(ArchiveSection):
     reaction_constants = SubSection(section_def=ReactionConstant, repeats=True)
 
 
+class Monomer(PureSubstanceComponent):
+    # TODO: use Topology class to visualize the smiles
+    smiles = Quantity(
+        type=str,
+        description='SMILES representation of the monomer.',
+        a_eln=ELNAnnotation(
+            component=ELNComponentEnum.StringEditQuantity,
+        ),
+    )
+    pure_substance = SubSection(
+        section_def=PubChemPureSubstanceSection,
+    )
+
+    def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
+        if self.substance_name and self.pure_substance is None:
+            self.pure_substance = PubChemPureSubstanceSection(name=self.substance_name)
+            self.pure_substance.normalize(archive, logger)
+        if not self.smiles:
+            self.smiles = self.pure_substance.smile
+        super().normalize(archive, logger)
+
+
 class PolymerizationReaction(Activity, Schema):
     monomers = SubSection(
         description='Monomers used in the polymerization reaction.',
-        section_def=PubChemPureSubstanceSection,
+        section_def=Monomer,
         repeats=True,
     )
-
     polymer = SubSection(
         description='Polymer formed in the polymerization reaction.',
         section_def=CompositeSystem,

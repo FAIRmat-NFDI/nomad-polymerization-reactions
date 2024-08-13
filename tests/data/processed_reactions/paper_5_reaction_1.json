@@ -1,0 +1,22 @@
+{
+    "file": "paper_5.json",
+    "monomer1_s": "C=C(C)C(=O)OC",
+    "monomer2_s": "C=C(C)C(=O)O",
+    "monomer1": "Methyl Methacrylate",
+    "monomer2": "Methacrylic Acid",
+    "r_values": {
+        "constant_1": 0.63,
+        "constant_2": 0.25
+    },
+    "conf_intervals": {
+        "constant_conf_1": 0.03,
+        "constant_conf_2": 0.05
+    },
+    "temperature": 70.0,
+    "temperature_unit": "\u00b0C",
+    "solvent": "CC(C)O",
+    "method": "solvent",
+    "r-product": null,
+    "source": "https://doi.org/10.1016/0014-3057(94)00111-1",
+    "logP": 0.38710000000000006
+}

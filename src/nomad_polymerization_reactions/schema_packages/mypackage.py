@@ -104,7 +104,7 @@ class PolymerizationReaction(Activity, Schema):
         ),
     )
 
-    reaction_conditions = SubSection(section_def=ReactionConditions, repeats=True)
+    reaction_conditions = SubSection(section_def=ReactionConditions)
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         if self.monomers is not None:

@@ -6,14 +6,14 @@ class MySchemaPackageEntryPoint(SchemaPackageEntryPoint):
     parameter: int = Field(0, description='Custom configuration parameter')
 
     def load(self):
-        from nomad_polymerization_reactions.schema_packages.mypackage import (
+        from nomad_polymerization_reactions.schema_packages.polymerization import (
             m_package,
         )
 
         return m_package
 
 
-mypackage = MySchemaPackageEntryPoint(
-    name='MyPackage',
-    description='Schema package defined using the new plugin mechanism.',
+polymerization = MySchemaPackageEntryPoint(
+    name='Polymerization',
+    description='Schema package defining FAIR datamodels for polymerization reactions.',
 )

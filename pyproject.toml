@@ -120,5 +120,5 @@ where = ["src"]
 skip = [".github/*"]
 
 [project.entry-points.'nomad.plugin']
-mypackage = "nomad_polymerization_reactions.schema_packages:mypackage"
+polymerization_schema = "nomad_polymerization_reactions.schema_packages:polymerization"
 myapp = "nomad_polymerization_reactions.apps:myapp"

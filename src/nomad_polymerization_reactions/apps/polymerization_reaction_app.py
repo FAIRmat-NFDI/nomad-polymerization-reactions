@@ -11,32 +11,32 @@ readme: 'This page allows you to search **polymerization reactions**
   interactive statistics about the data.'
 filters:
   include:
-  - '*#nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction'
+  - '*#nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction'
   exclude:
   - mainfile
   - entry_name
   - combine
 filters_locked:
-  sections: nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction
+  sections: nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction
 # pagination:
-  # order_by: data.reaction_conditions.solvent.name#nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction
+  # order_by: data.reaction_conditions.solvent.name#nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction
 search_syntaxes:
   exclude:
   - free_text
 columns:
   selected:
-  - data.reaction_conditions.solvent.name#nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction
-  - data.reaction_conditions.method#nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction
-  - data.reaction_conditions.polymerization_type#nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction
-  - data.reaction_conditions.determination_method#nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction
-  - data.reaction_conditions.temperature#nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction
+  - data.reaction_conditions.solvent.name#nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction
+  - data.reaction_conditions.method#nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction
+  - data.reaction_conditions.polymerization_type#nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction
+  - data.reaction_conditions.determination_method#nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction
+  - data.reaction_conditions.temperature#nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction
   - references
   options:
-    data.reaction_conditions.solvent.name#nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction: {label: Solvent}
-    data.reaction_conditions.method#nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction: {label: Method}
-    data.reaction_conditions.polymerization_type#nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction: {label: Type}
-    data.reaction_conditions.determination_method#nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction: {label: Determination}
-    data.reaction_conditions.temperature#nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction:
+    data.reaction_conditions.solvent.name#nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction: {label: Solvent}
+    data.reaction_conditions.method#nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction: {label: Method}
+    data.reaction_conditions.polymerization_type#nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction: {label: Type}
+    data.reaction_conditions.determination_method#nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction: {label: Determination}
+    data.reaction_conditions.temperature#nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction:
       format:
         decimals: 2
         mode: standard

@@ -1,6 +1,6 @@
 data:
   extracted_json_data: paper_0.json
-  m_def: nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction
+  m_def: nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction
   monomers:
   - smiles: C=C
     substance_name: ethylene

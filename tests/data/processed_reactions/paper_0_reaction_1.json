@@ -1,0 +1,21 @@
+{
+    "file": "paper_0.json",
+    "monomer1_s": "C=C",
+    "monomer2_s": "C=O",
+    "monomer1": "ethylene",
+    "monomer2": "carbon monoxide",
+    "r_values": {
+        "constant_1": 22.0,
+        "constant_2": 0.0
+    },
+    "conf_intervals": {
+        "constant_conf_1": null,
+        "constant_conf_2": null
+    },
+    "temperature": 20.0,
+    "temperature_unit": "\u00b0C",
+    "solvent": null,
+    "method": "bulk",
+    "r-product": null,
+    "source": "https://doi.org/10.1002/pol.1963.110010415"
+}

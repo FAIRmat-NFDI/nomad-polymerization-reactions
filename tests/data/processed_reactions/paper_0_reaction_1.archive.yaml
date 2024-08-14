@@ -1,0 +1,13 @@
+data:
+  extracted_json_data: paper_0.json
+  m_def: nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction
+  monomers:
+  - smiles: C=C
+    substance_name: ethylene
+  - smiles: C=O
+    substance_name: carbon monoxide
+  publication_reference:
+    DOI_number: https://doi.org/10.1002/pol.1963.110010415
+  reaction_conditions:
+    method: bulk
+    temperature: 293.15

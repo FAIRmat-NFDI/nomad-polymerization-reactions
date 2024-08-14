@@ -1,5 +1,5 @@
 data:
-  m_def: nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction
+  m_def: nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction
   extracted_json_data: "paper01.json"
   publication_reference:
     DOI_number: "https://doi.org/10.1002/macp.1985.021860810"

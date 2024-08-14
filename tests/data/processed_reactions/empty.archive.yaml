@@ -1,2 +1,2 @@
 data:
-  m_def: nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction
+  m_def: nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction

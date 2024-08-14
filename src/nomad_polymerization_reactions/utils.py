@@ -89,7 +89,7 @@ def generate_archive_from_json(filepath: str, logger: 'BoundLogger' = None):  # 
         iterator += 1
 
     data_dict_ordered['m_def'] = (
-        'nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction'
+        'nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction'
     )
     if file_dict.get('file', None) is not None:
         data_dict_ordered['extracted_json_data'] = file_dict.get('file', None)

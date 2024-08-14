@@ -24,7 +24,7 @@ from nomad.datamodel.metainfo.basesections import (
 from nomad.metainfo import Quantity, SchemaPackage, SubSection
 
 configuration = config.get_plugin_entry_point(
-    'nomad_polymerization_reactions.schema_packages:mypackage'
+    'nomad_polymerization_reactions.schema_packages:polymerization'
 )
 
 m_package = SchemaPackage()

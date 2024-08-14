@@ -1,7 +1,7 @@
 data:
   extracted_json_data: paper_5.json
   logP: 0.38710000000000006
-  m_def: nomad_polymerization_reactions.schema_packages.mypackage.PolymerizationReaction
+  m_def: nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction
   monomers:
   - smiles: C=C(C)C(=O)OC
     substance_name: Methyl Methacrylate

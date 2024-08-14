@@ -9,7 +9,42 @@ if TYPE_CHECKING:
     from structlog.stdlib import BoundLogger
 
 
-def generate_archive_from_llm_output(filepath: str, logger: 'BoundLogger' = None):  # noqa: PLR0912
+def generate_archive_from_json(filepath: str, logger: 'BoundLogger' = None):  # noqa: PLR0912
+    """
+    Generate an archive.yaml file from a JSON file coming from the LLM output.
+    Function expects a JSON of the following format:
+    ```json
+    {
+        "file": "paper_0.json",
+        "monomer1_s": "C=C",
+        "monomer2_s": "C=O",
+        "monomer1": "ethylene",
+        "monomer2": "carbon monoxide",
+        "r_values": {
+            "constant_1": 22.0,
+            "constant_2": 0.0
+        },
+        "conf_intervals": {
+            "constant_conf_1": null,
+            "constant_conf_2": null
+        },
+        "temperature": 20.0,
+        "temperature_unit": "\u00b0C",
+        "solvent": null,
+        "method": "bulk",
+        "r-product": null,
+        "source": "https://doi.org/10.1002/pol.1963.110010415"
+    }
+    ```
+
+    Args:
+        filepath (str): Path to the JSON file.
+        logger (BoundLogger): A structlog logger.
+
+    Returns:
+        dict: The dict used to generate archive.yaml file.
+    """
+
     class OrderedDumper(yaml.Dumper):
         def represent_dict(self, data):
             return self.represent_mapping('tag:yaml.org,2002:map', data.items())

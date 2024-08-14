@@ -20,6 +20,7 @@ from nomad.datamodel.metainfo.basesections import (
     PubChemPureSubstanceSection,
     PublicationReference,
     PureSubstanceComponent,
+    SectionReference,
 )
 from nomad.metainfo import Quantity, SchemaPackage, SubSection
 
@@ -115,6 +116,13 @@ class PolymerizationReaction(Activity, Schema):
                 self.polymer = CompositeSystem()
             self.polymer.components = self.monomers
         super().normalize(archive, logger)
+
+
+class PolymerizationReactionReference(SectionReference):
+    reference = SubSection(
+        section_def=PolymerizationReaction,
+        description='Reference to the polymerization reaction.',
+    )
 
 
 m_package.__init_metainfo__()

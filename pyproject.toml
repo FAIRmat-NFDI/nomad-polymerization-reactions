@@ -121,4 +121,4 @@ skip = [".github/*"]
 
 [project.entry-points.'nomad.plugin']
 polymerization_schema = "nomad_polymerization_reactions.schema_packages:polymerization"
-myapp = "nomad_polymerization_reactions.apps:myapp"
+polymerization_app = "nomad_polymerization_reactions.apps:polymerization"

@@ -1,6 +1,6 @@
 import yaml
 
-polymerization_reaction_app = yaml.safe_load(
+app = yaml.safe_load(
     """
 label: Polymerization Reaction
 path: polymerization

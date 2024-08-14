@@ -14,24 +14,32 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
 ]
 name = "nomad-polymerization-reactions"
-description = "Nomad example template"
+description = "A NOMAD plugin for polymerization reactions."
 version = "0.1.0"
 readme = "README.md"
 requires-python = ">=3.9"
 authors = [
     { name = "Pepe Márquez", email = "jose.marquez@physik.hu-berlin.de" },
+    { name = "Sarthak Kapoor", email = "sarthakkapoor@hotmail.com"},
 ]
 maintainers = [
     { name = "Pepe Márquez", email = "jose.marquez@physik.hu-berlin.de" },
+    { name = "Sarthak Kapoor", email = "sarthakkapoor@hotmail.com"},
 ]
 license = { file = "LICENSE" }
-dependencies = ["nomad-lab>=1.3.5dev"]
+dependencies = [
+    "nomad-lab>=1.3.5dev",
+]
 
 [project.urls]
-Repository = "https://github.com/Pepe-Marquez/nomad-nomad-polymerization-reactions"
+Repository = "https://github.com/FAIRmat-NFDI/nomad-polymerization-reactions"
 
 [project.optional-dependencies]
-dev = ["ruff", "pytest", "structlog"]
+dev = [
+    "ruff",
+    "pytest",
+    "structlog",
+]
 
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
@@ -107,11 +115,10 @@ package-dir = { "" = "src" }
 [tool.setuptools.packages.find]
 where = ["src"]
 
-[project.entry-points.'nomad.plugin']
-
-mypackage = "nomad_polymerization_reactions.schema_packages:mypackage"
-
-myapp = "nomad_polymerization_reactions.apps:myapp"
 [tool.cruft]
 # Avoid updating workflow files, this leads to permissions issues
 skip = [".github/*"]
+
+[project.entry-points.'nomad.plugin']
+mypackage = "nomad_polymerization_reactions.schema_packages:mypackage"
+myapp = "nomad_polymerization_reactions.apps:myapp"

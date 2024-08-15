@@ -1,3 +1,4 @@
+import glob
 import os
 
 from click.testing import CliRunner
@@ -23,10 +24,12 @@ def test_create_archive_help():
 
 
 def test_create_archive_success():
-    result = invoke_cli(
-        cli,
-        ['create-archive', 'tests/data/processed_reactions/paper_0_reaction_1.json'],
-    )
+    files = glob.glob('tests/data/processed_reactions/*.json')
+    result = invoke_cli(cli, ['create-archive', *files])
     assert result.exit_code == 0
-    assert 'Archive created successfully.' in result.output
-    os.remove('paper_0_reaction_1.archive.yaml')
+    assert (
+        'Archive created successfully.\nArchive created successfully.\n'
+        in result.output
+    )
+    for file in files:
+        os.remove(file.split('/')[-1].replace('.json', '.archive.yaml'))

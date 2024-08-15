@@ -20,12 +20,14 @@ def cli():
 )
 @click.argument(
     'JSON_FILE_PATH',
+    nargs=-1,
     required=True,
     type=click.Path(exists=True),
 )
 def _create_archive(json_file_path):
     try:
-        generate_archive_from_json(json_file_path)
-        click.echo('Archive created successfully.')
+        for file_path in json_file_path:
+            generate_archive_from_json(file_path)
+            click.echo('Archive created successfully.')
     except Exception as e:
         click.echo(f'Archive creation failed. Error: {e}')

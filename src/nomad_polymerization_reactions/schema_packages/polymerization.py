@@ -96,11 +96,11 @@ class PolymerizationReaction(Activity, Schema):
         description='Reference to the publication containing the data.',
         section_def=PublicationReference,
     )
-    extracted_json_data = Quantity(
+    data_file_name = Quantity(
         type=str,
         description='Data file containing the extracted data.',
         a_eln=ELNAnnotation(
-            component=ELNComponentEnum.FileEditQuantity,
+            component=ELNComponentEnum.StringEditQuantity,
         ),
     )
 

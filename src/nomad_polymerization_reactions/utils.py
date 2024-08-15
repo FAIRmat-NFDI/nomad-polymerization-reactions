@@ -92,7 +92,7 @@ def generate_archive_from_json(filepath: str, logger: 'BoundLogger' = None):  # 
         'nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction'
     )
     if file_dict.get('file', None) is not None:
-        data_dict_ordered['extracted_json_data'] = file_dict.get('file', None)
+        data_dict_ordered['data_file_name'] = file_dict.get('file', None)
     if file_dict.get('source', None) is not None:
         data_dict_ordered['publication_reference'] = dict(
             DOI_number=file_dict['source']

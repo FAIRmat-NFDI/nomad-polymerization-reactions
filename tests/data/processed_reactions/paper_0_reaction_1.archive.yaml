@@ -1,5 +1,5 @@
 data:
-  extracted_json_data: paper_0.json
+  data_file_name: paper_0.json
   m_def: nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction
   monomers:
   - smiles: C=C

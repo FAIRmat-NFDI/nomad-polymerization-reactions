@@ -41,6 +41,9 @@ dev = [
     "structlog",
 ]
 
+[project.scripts]
+nomad-polymerization = "nomad_polymerization_reactions.cli:cli"
+
 [tool.ruff]
 # Exclude a variety of commonly ignored directories.
 exclude = [

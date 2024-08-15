@@ -9,9 +9,9 @@ if TYPE_CHECKING:
     from structlog.stdlib import BoundLogger
 
 
-def generate_archive_from_json(
+def generate_archive_from_json(  # noqa: PLR0912, PLR0915
     filepath: str, same_dir_as_input: bool = False, logger: 'BoundLogger' = None
-):  # noqa: PLR0912
+):
     """
     Generate an archive.yaml file from a JSON file coming from the LLM output.
     Function expects a JSON of the following format:

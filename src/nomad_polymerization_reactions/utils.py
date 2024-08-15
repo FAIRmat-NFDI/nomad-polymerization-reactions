@@ -9,7 +9,9 @@ if TYPE_CHECKING:
     from structlog.stdlib import BoundLogger
 
 
-def generate_archive_from_json(filepath: str, logger: 'BoundLogger' = None):  # noqa: PLR0912
+def generate_archive_from_json(
+    filepath: str, same_dir_as_input: bool = False, logger: 'BoundLogger' = None
+):  # noqa: PLR0912
     """
     Generate an archive.yaml file from a JSON file coming from the LLM output.
     Function expects a JSON of the following format:
@@ -39,6 +41,8 @@ def generate_archive_from_json(filepath: str, logger: 'BoundLogger' = None):  # 
 
     Args:
         filepath (str): Path to the JSON file.
+        same_dir_as_input (bool): If True, the output is created inside the same
+        directory as the input JSON file.
         logger (BoundLogger): A structlog logger.
 
     Returns:
@@ -108,8 +112,11 @@ def generate_archive_from_json(filepath: str, logger: 'BoundLogger' = None):  # 
 
     data_dict = dict(data_dict_ordered)
     entry = dict(data=data_dict)
-    archive_name = filepath.split('/')[-1].split('.')[0]
-    with open(f'{archive_name}.archive.yaml', 'w') as f:
+    if same_dir_as_input:
+        archive_path = filepath.replace('.json', '.archive.yaml')
+    else:
+        archive_path = filepath.split('/')[-1].replace('.json', '.archive.yaml')
+    with open(archive_path, 'w') as f:
         yaml.dump(entry, f, Dumper=OrderedDumper, default_flow_style=False)
 
     return entry

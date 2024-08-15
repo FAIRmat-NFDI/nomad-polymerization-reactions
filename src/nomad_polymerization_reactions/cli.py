@@ -24,10 +24,16 @@ def cli():
     required=True,
     type=click.Path(exists=True),
 )
-def _create_archive(json_file_path):
+@click.option(
+    '--same-dir-as-input',
+    is_flag=True,
+    default=False,
+    help='Create the archive in the same directory as the input JSON file.',
+)
+def _create_archive(json_file_path, same_dir_as_input):
     try:
         for file_path in json_file_path:
-            generate_archive_from_json(file_path)
+            generate_archive_from_json(file_path, same_dir_as_input)
             click.echo('Archive created successfully.')
     except Exception as e:
         click.echo(f'Archive creation failed. Error: {e}')

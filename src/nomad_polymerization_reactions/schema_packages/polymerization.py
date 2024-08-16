@@ -13,7 +13,12 @@ if TYPE_CHECKING:
 import numpy as np
 from nomad.config import config
 from nomad.datamodel.data import ArchiveSection, Schema, Section
-from nomad.datamodel.metainfo.annotations import ELNAnnotation, ELNComponentEnum
+from nomad.datamodel.metainfo.annotations import (
+    ELNAnnotation,
+    ELNComponentEnum,
+    Filter,
+    SectionProperties,
+)
 from nomad.datamodel.metainfo.basesections import (
     Activity,
     CompositeSystem,
@@ -85,6 +90,13 @@ class Monomer(PureSubstanceComponent):
 class PolymerizationReaction(Activity, Schema):
     m_def = Section(
         description='Schema for polymerization reaction.',
+        a_eln=ELNAnnotation(
+            properties=SectionProperties(
+                visible=Filter(
+                    exclude=['method', 'steps'],
+                ),
+            ),
+        ),
     )
     monomers = SubSection(
         description='Monomers used in the polymerization reaction.',

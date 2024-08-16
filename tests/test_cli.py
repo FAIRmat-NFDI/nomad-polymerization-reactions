@@ -2,6 +2,7 @@ import glob
 import os
 
 from click.testing import CliRunner
+
 from nomad_polymerization_reactions.cli import cli
 
 

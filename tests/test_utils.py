@@ -2,6 +2,7 @@ import os
 
 import pytest
 import yaml
+
 from nomad_polymerization_reactions.utils import generate_archive_from_json
 
 

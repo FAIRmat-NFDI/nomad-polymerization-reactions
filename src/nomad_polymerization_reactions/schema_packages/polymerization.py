@@ -114,6 +114,8 @@ class PolymerizationReaction(Activity, Schema):
             if self.polymer is None:
                 self.polymer = CompositeSystem()
             self.polymer.components = self.monomers
+            self.polymer.elemental_composition = []
+            self.polymer.normalize(archive, logger)
         super().normalize(archive, logger)
 
 

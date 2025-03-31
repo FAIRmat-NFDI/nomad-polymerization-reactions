@@ -1,81 +1,105 @@
-# nomad-nomad-polymerization-reactions
+# nomad-polymerization-reactions
 
 Nomad example template
 
-----
-
-This `nomad`_ plugin was generated with `Cookiecutter`_ along with `@nomad`_'s `cookiecutter-nomad-plugin`_ template.
+This `nomad` plugin was generated with `Cookiecutter` along with `@nomad`'s [`cookiecutter-nomad-plugin`](https://github.com/FAIRmat-NFDI/cookiecutter-nomad-plugin) template.
 
 
-### Install
+## Development
 
-You should create a virtual environment. You will need the `nomad-lab` package (and `pytest`).
-We recommend using Python 3.9.
-
+If you want to develop locally this plugin, clone the project and in the plugin folder, create a virtual environment (you can use Python 3.9, 3.10, or 3.11):
 ```sh
-python3 -m venv .pyenv
-source .pyenv/bin/activate
+git clone https://github.com/Pepe-Marquez/nomad-polymerization-reactions.git
+cd nomad-polymerization-reactions
+python3.11 -m venv .pyenv
+. .pyenv/bin/activate
+```
+
+Make sure to have `pip` upgraded:
+```sh
 pip install --upgrade pip
-pip install -e '.[dev]' --index-url https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple
+```
+
+We recommend installing `uv` for fast pip installation of the packages:
+```sh
+pip install uv
+```
+
+Install the `nomad-lab` package:
+```sh
+uv pip install '.[dev]' --index-url https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple
 ```
 
 **Note!**
-Until we have an official pypi NOMAD release with the plugins functionality. Make
-sure to include NOMAD's internal package registry (e.g. via `--index-url`).
+Until we have an official pypi NOMAD release with the plugins functionality make
+sure to include NOMAD's internal package registry (via `--index-url` in the above command).
 
-### Testing
-
-You can run automated tests with `pytest`:
-
+The plugin is still under development. If you would like to contribute, install the package in editable mode (with the added `-e` flag):
 ```sh
-pytest -svx tests
+uv pip install -e '.[dev]' --index-url https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple
 ```
 
-### Run linting
 
+### Run the tests
+
+You can run locally the tests:
+```sh
+python -m pytest -sv tests
+```
+
+where the `-s` and `-v` options toggle the output verbosity.
+
+Our CI/CD pipeline produces a more comprehensive test report using the `pytest-cov` package. You can generate a local coverage report:
+```sh
+uv pip install pytest-cov
+python -m pytest --cov=src tests
+```
+
+### Run linting and auto-formatting
+
+We use [Ruff](https://docs.astral.sh/ruff/) for linting and formatting the code. Ruff auto-formatting is also a part of the GitHub workflow actions. You can run locally:
 ```sh
 ruff check .
+ruff format . --check
 ```
 
-### Run auto-formatting
 
-This is entirely optional. To add this as a check in github actions pipeline, uncomment the `ruff-formatting` step in `./github/workflows/actions.yaml`.
+### Debugging
 
-```sh
-ruff format .
+For interactive debugging of the tests, use `pytest` with the `--pdb` flag. We recommend using an IDE for debugging, e.g., _VSCode_. If that is the case, add the following snippet to your `.vscode/launch.json`:
+```json
+{
+  "configurations": [
+      {
+        "name": "<descriptive tag>",
+        "type": "debugpy",
+        "request": "launch",
+        "cwd": "${workspaceFolder}",
+        "program": "${workspaceFolder}/.pyenv/bin/pytest",
+        "justMyCode": true,
+        "env": {
+            "_PYTEST_RAISE": "1"
+        },
+        "args": [
+            "-sv",
+            "--pdb",
+            "<path-to-plugin-tests>",
+        ]
+    }
+  ]
+}
 ```
 
-### Developing a NOMAD plugin
+where `<path-to-plugin-tests>` must be changed to the local path to the test module to be debugged.
 
-Follow the [guide](https://nomad-lab.eu/prod/v1/staging/docs/howto/plugins/plugins.html) on how to develop NOMAD plugins.
+The settings configuration file `.vscode/settings.json` automatically applies the linting and formatting upon saving the modified file.
 
-### Build the python package
-
-The `pyproject.toml` file contains everything that is necessary to turn the project
-into a pip installable python package. Run the python build tool to create a package distribution:
-
-```
-pip install build
-python -m build --sdist
-```
-
-You can install the package with pip:
-
-```
-pip install dist/nomad-nomad-polymerization-reactions-0.1.0
-```
-
-Read more about python packages, `pyproject.toml`, and how to upload packages to PyPI
-on the [PyPI documentation](https://packaging.python.org/en/latest/tutorials/packaging-projects/).
 
 ### Documentation on Github pages
 
-To deploy documentation on Github pages, make sure to [enable GitHub pages via the repo settings](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site#publishing-from-a-branch). 
-
-To view the documentation locally, install the documentation related packages using:
-
+To view the documentation locally, install the related packages using:
 ```sh
-pip install -r requirements_docs.txt
+uv pip install -r requirements_docs.txt
 ```
 
 Run the documentation server:
@@ -83,11 +107,65 @@ Run the documentation server:
 mkdocs serve
 ```
 
+
+## Adding this plugin to NOMAD
+
+Currently, NOMAD has two distinct flavors that are relevant depending on your role as an user:
+1. [A NOMAD Oasis](#adding-this-plugin-in-your-nomad-oasis): any user with a NOMAD Oasis instance.
+2. [Local NOMAD installation and the source code of NOMAD](#adding-this-plugin-in-your-local-nomad-installation-and-the-source-code-of-nomad): internal developers.
+
+### Adding this plugin in your NOMAD Oasis
+
+Read the [NOMAD plugin documentation](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/plugins_install.html) for all details on how to deploy the plugin on your NOMAD instance.
+
+### Adding this plugin in your local NOMAD installation and the source code of NOMAD
+
+Modify the text file under `/nomad/default_plugins.txt` and add:
+```sh
+<other-content-in-default_plugins.txt>
+nomad-polymerization-reactions==x.y.z
+```
+where `x.y.z` represents the released version of this plugin.
+
+Then, go to your NOMAD folder, activate your NOMAD virtual environment and run:
+```sh
+deactivate
+cd <route-to-NOMAD-folder>/nomad
+source .pyenv/bin/activate
+./scripts/setup_dev_env.sh
+```
+
+Alternatively and only valid for your local NOMAD installation, you can modify `nomad.yaml` to include this plugin, see [NOMAD Oasis - Install plugins](https://nomad-lab.eu/prod/v1/staging/docs/howto/oasis/plugins_install.html).
+
+
+### Build the python package
+
+The `pyproject.toml` file contains everything that is necessary to turn the project
+into a pip installable python package. Run the python build tool to create a package distribution:
+
+```sh
+pip install build
+python -m build --sdist
+```
+
+You can install the package with pip:
+
+```sh
+pip install dist/nomad-polymerization-reactions-0.1.0
+```
+
+Read more about python packages, `pyproject.toml`, and how to upload packages to PyPI
+on the [PyPI documentation](https://packaging.python.org/en/latest/tutorials/packaging-projects/).
+
+
 ### Template update
 
 We use cruft to update the project based on template changes. A `cruft-update.yml` is included in Github workflows to automatically check for updates and create pull requests to apply updates. Follow the [instructions](https://github.blog/changelog/2022-05-03-github-actions-prevent-github-actions-from-creating-and-approving-pull-requests/) on how to enable Github Actions to create pull requests. 
 
 To run the check for updates locally, follow the instructions on [`cruft` website](https://cruft.github.io/cruft/#updating-a-project).
 
-### License
-Distributed under the terms of the `Apache Software License 2.0`_ license, "nomad-nomad-polymerization-reactions" is free and open source software
+
+## Main contributors
+| Name | E-mail     |
+|------|------------|
+| Pepe Márquez | [jose.marquez@physik.hu-berlin.de](mailto:jose.marquez@physik.hu-berlin.de)

@@ -1,0 +1,39 @@
+diff a/pyproject.toml b/pyproject.toml	(rejected hunks)
+@@ -13,7 +13,7 @@ classifiers = [
+     "Programming Language :: Python :: 3.12",
+     "License :: OSI Approved :: Apache Software License",
+ ]
+-name = "nomad-nomad-polymerization-reactions"
++name = "nomad-polymerization-reactions"
+ description = "Nomad example template"
+ version = "0.1.0"
+ readme = "README.md"
+@@ -25,10 +25,13 @@ maintainers = [
+     { name = "Pepe Márquez", email = "jose.marquez@physik.hu-berlin.de" },
+ ]
+ license = { file = "LICENSE" }
+-dependencies = ["nomad-lab>=1.3.0"]
++dependencies = [
++    "nomad-lab>=1.3.0",
++    "python-magic-bin; sys_platform == 'win32'",
++]
+ 
+ [project.urls]
+-Repository = "https://github.com/Pepe-Marquez/nomad-nomad-polymerization-reactions"
++Repository = "https://github.com/Pepe-Marquez/nomad-polymerization-reactions"
+ 
+ [project.optional-dependencies]
+ dev = ["ruff", "pytest", "structlog"]
+@@ -109,9 +112,10 @@ where = ["src"]
+ 
+ [project.entry-points.'nomad.plugin']
+ 
+-mypackage = "nomad_nomad_polymerization_reactions.schema_packages:mypackage"
++schema_package_entry_point = "nomad_polymerization_reactions.schema_packages:schema_package_entry_point"
+ 
+-myapp = "nomad_nomad_polymerization_reactions.apps:myapp"
++app_entry_point = "nomad_polymerization_reactions.apps:app_entry_point"
++example_upload_entry_point = "nomad_polymerization_reactions.example_uploads:example_upload_entry_point"
+ [tool.cruft]
+ # Avoid updating workflow files, this leads to permissions issues
+ skip = [".github/*"]

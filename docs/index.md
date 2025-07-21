@@ -1,4 +1,4 @@
-# Welcome to the `nomad-nomad-polymerization-reactions` documentation
+# Welcome to the `nomad-polymerization-reactions` documentation
 
 Nomad example template
 

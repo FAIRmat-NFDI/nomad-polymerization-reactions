@@ -1,8 +1,8 @@
-site_name: nomad-nomad-polymerization-reactions
+site_name: nomad-polymerization-reactions
 site_description: Nomad example template
 site_author: Pepe Márquez
 
-repo_url: https://github.com/Pepe-Marquez/nomad-nomad-polymerization-reactions
+repo_url: https://github.com/Pepe-Marquez/nomad-polymerization-reactions
 edit_uri: ""
 
 nav:

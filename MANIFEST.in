@@ -1,1 +1,2 @@
 recursive-include * nomad_plugin.yaml
+graft src/nomad_polymerization_reactions/example_uploads

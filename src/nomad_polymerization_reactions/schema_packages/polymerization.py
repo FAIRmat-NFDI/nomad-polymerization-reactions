@@ -69,11 +69,11 @@ class AtomicFeatures(ArchiveSection):
         """,
         a_eln=dict(component='AutocompleteEditQuantity'),
     )
-    coordinates = Quantity(
+    positions = Quantity(
         type=np.dtype(np.float64),
         shape=[3],
         unit='angstrom',
-        description='Atomic coordinates.',
+        description='Atomic positions.',
         a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
     charge = Quantity(

@@ -1,17 +1,9 @@
 from typing import (
     TYPE_CHECKING,
 )
-from nomad.datamodel.metainfo.basesections.v1 import PureSubstance
-
-if TYPE_CHECKING:
-    from nomad.datamodel.datamodel import (
-        EntryArchive,
-    )
-    from structlog.stdlib import (
-        BoundLogger,
-    )
 
 import numpy as np
+from ase.data import chemical_symbols
 from nomad.config import config
 from nomad.datamodel.data import ArchiveSection, Schema
 from nomad.datamodel.metainfo.annotations import ELNAnnotation, ELNComponentEnum
@@ -21,8 +13,17 @@ from nomad.datamodel.metainfo.basesections import (
     PubChemPureSubstanceSection,
     PublicationReference,
 )
-from nomad.metainfo import Quantity, SchemaPackage, SubSection
+from nomad.datamodel.metainfo.basesections.v1 import PureSubstance
+from nomad.metainfo import MEnum, Quantity, SchemaPackage, SubSection
+from nomad.metainfo.metainfo import Section
 
+if TYPE_CHECKING:
+    from nomad.datamodel.datamodel import (
+        EntryArchive,
+    )
+    from structlog.stdlib import (
+        BoundLogger,
+    )
 configuration = config.get_plugin_entry_point(
     'nomad_polymerization_reactions.schema_packages:polymerization'
 )
@@ -60,6 +61,109 @@ class ReactionConditions(ArchiveSection):
     reaction_constants = SubSection(section_def=ReactionConstant, repeats=True)
 
 
+class AtomicFeatures(ArchiveSection):
+    element = Quantity(
+        type=MEnum(chemical_symbols[1:]),
+        description="""
+        The symbol of the element, e.g. 'Pb'.
+        """,
+        a_eln=dict(component='AutocompleteEditQuantity'),
+    )
+    coordinates = Quantity(
+        type=np.dtype(np.float64),
+        shape=[3],
+        unit='angstrom',
+        description='Atomic coordinates.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    charge = Quantity(
+        type=np.dtype(np.float64),
+        unit='eV',
+        description='Atomic charge.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    fukui_electrophilicity = Quantity(
+        type=np.dtype(np.float64),
+        description='Fukui electrophilicity index of the atom.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    fukui_nucleophilicity = Quantity(
+        type=np.dtype(np.float64),
+        description='Fukui nucleophilicity index of the atom.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    fukui_radical = Quantity(
+        type=np.dtype(np.float64),
+        description='Fukui radical index of the atom.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+
+
+class XTBFeatures(ArchiveSection):
+    m_def = Section(
+        description='xTB calculated features of the best conformer of the molecule.',
+    )
+    energy = Quantity(
+        type=np.dtype(np.float64),
+        unit='eV',
+        description='Energy of the best conformer of the molecule.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    ionization_potential = Quantity(
+        type=np.dtype(np.float64),
+        unit='eV',
+        description='Ionization potential of the molecule.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    ionization_potential_corrected = Quantity(
+        type=np.dtype(np.float64),
+        unit='eV',
+        description='Corrected ionization potential based on ???.',
+        # TODO: based on what?
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    electron_affinity = Quantity(
+        type=np.dtype(np.float64),
+        unit='eV',
+        description='Electron affinity of the molecule.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    homo_energy = Quantity(
+        type=np.dtype(np.float64),
+        unit='eV',
+        description='HOMO energy of the molecule.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    lumo_energy = Quantity(
+        type=np.dtype(np.float64),
+        unit='eV',
+        description='LUMO energy of the molecule.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    global_electrophilicity = Quantity(
+        type=np.dtype(np.float64),
+        description='Global electrophilicity index of the molecule.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    global_nucleophilicity = Quantity(
+        type=np.dtype(np.float64),
+        description='Global nucleophilicity index of the molecule.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    dipole_moment = Quantity(
+        type=np.dtype(np.float64),
+        shape=[3],
+        unit='debye',
+        description='Dipole moment of the molecule.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    atomic_features = SubSection(
+        description='Atomic features of the best conformer of the molecule.',
+        section_def=AtomicFeatures,
+        repeats=True,
+    )
+
+
 class Monomer(PureSubstance, Schema):
     smiles = Quantity(
         type=str,
@@ -79,6 +183,10 @@ class Monomer(PureSubstance, Schema):
             label='detailed monomer description',
             props=dict(height=200),
         ),
+    )
+    xtb_features = SubSection(
+        description='xTB calculated features of the monomer.',
+        section_def=XTBFeatures,
     )
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:

@@ -1,6 +1,7 @@
 from typing import (
     TYPE_CHECKING,
 )
+from nomad.datamodel.metainfo.basesections.v1 import PureSubstance
 
 if TYPE_CHECKING:
     from nomad.datamodel.datamodel import (
@@ -19,7 +20,6 @@ from nomad.datamodel.metainfo.basesections import (
     CompositeSystem,
     PubChemPureSubstanceSection,
     PublicationReference,
-    PureSubstanceComponent,
 )
 from nomad.metainfo import Quantity, SchemaPackage, SubSection
 
@@ -60,8 +60,7 @@ class ReactionConditions(ArchiveSection):
     reaction_constants = SubSection(section_def=ReactionConstant, repeats=True)
 
 
-class Monomer(PureSubstanceComponent):
-    # TODO: use Topology class to visualize the smiles
+class Monomer(PureSubstance, Schema):
     smiles = Quantity(
         type=str,
         description='SMILES representation of the monomer.',
@@ -69,16 +68,28 @@ class Monomer(PureSubstanceComponent):
             component=ELNComponentEnum.StringEditQuantity,
         ),
     )
-    pure_substance = SubSection(
-        section_def=PubChemPureSubstanceSection,
+    description = Quantity(
+        type=str,
+        description="""
+        A field for adding additional information about the monomer that is not
+        captured by the other quantities and subsections.
+        """,
+        a_eln=dict(
+            component='RichTextEditQuantity',
+            label='detailed monomer description',
+            props=dict(height=200),
+        ),
     )
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
-        if self.substance_name and self.pure_substance is None:
-            self.pure_substance = PubChemPureSubstanceSection(name=self.substance_name)
-            self.pure_substance.normalize(archive, logger)
-        if not self.smiles:
-            self.smiles = self.pure_substance.smile
+        self.components = []
+        self.elemental_composition = []
+        pure_substance = None
+        if self.smiles:
+            pure_substance = PubChemPureSubstanceSection(smile=self.smiles)
+            pure_substance.normalize(archive, logger)
+        if pure_substance:
+            self.pure_substance = pure_substance
         super().normalize(archive, logger)
 
 

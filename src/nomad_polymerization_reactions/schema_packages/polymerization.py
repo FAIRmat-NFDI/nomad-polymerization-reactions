@@ -203,8 +203,8 @@ class Monomer(PureSubstance, Schema):
 
 class PolymerizationReaction(Activity, Schema):
     monomers = SubSection(
-        description='Monomers used in the polymerization reaction.',
-        section_def=Monomer,
+        description='Reference to the monomers used in the polymerization reaction.',
+        section_def=SectionReference,
         repeats=True,
     )
     polymer = SubSection(
@@ -224,6 +224,114 @@ class PolymerizationReaction(Activity, Schema):
     )
 
     reaction_conditions = SubSection(section_def=ReactionConditions)
+
+    def get_monomer_reference(
+        self, smiles: str, archive: 'EntryArchive', logger: 'BoundLogger'
+    ) -> SectionReference | None:
+        """
+        Looks for an existing monomer entry with the given SMILES and returns its
+        proxy value wrapped in a `SectionReference`.
+        If found, it returns a reference to the entry.
+        If no entry is found, logs a warning and returns None.
+        If multiple entries are found, logs a warning and returns the first one.
+        """
+        from nomad.datamodel.context import ClientContext
+
+        if isinstance(archive.m_context, ClientContext):
+            return None
+
+        from nomad.search import search
+
+        search_result = search(
+            owner='visible',
+            query={
+                'search_quantities': {
+                    'id': (
+                        'data.smiles#nomad_polymerization_reactions.schema_'
+                        'packages.polymerization.Monomer'
+                    ),
+                    'str_value': f'{smiles}',
+                }
+            },
+            user_id=archive.metadata.main_author.user_id,
+        ).data
+
+        if not search_result:
+            logger.warning(f'No monomer found with the SMILES "{smiles}".')
+            return None
+
+        if len(search_result) > 1:
+            logger.warning(
+                f'Multiple monomers found with the SMILES "{smiles}". Using the first '
+                'one.'
+            )
+
+        upload_id = search_result[0]['upload_id']
+        entry_id = search_result[0]['entry_id']
+        m_proxy_value = f'../uploads/{upload_id}/archive/{entry_id}#/data'
+
+        return SectionReference(reference=m_proxy_value)
+
+    def create_monomer_entry(
+        self,
+        archive_name: str,
+        monomer: Monomer,
+        archive: 'EntryArchive',
+        logger: 'BoundLogger',
+    ) -> SectionReference | None:
+        """
+        Create a new monomer entry in the current Upload and return its proxy value
+        wrapped in a `SectionReference`.
+        """
+        from nomad.datamodel.context import ServerContext
+        from nomad.utils import hash as m_hash
+
+        if not isinstance(archive.m_context, ServerContext):
+            logger.warning(
+                f'Cannot create monomer entries in "{type(archive.m_context)}" '
+                'context. Returning None.'
+            )
+            return None
+
+        # TODO: unique name for the monomer entry archive
+
+        with archive.m_context.update_entry(
+            archive_name, write=True, process=True
+        ) as entry:
+            entry['data'] = monomer.m_to_dict(with_root_def=True)
+
+        entry_id = m_hash(archive.metadata.upload_id, archive_name)
+        m_proxy_value = (
+            f'../uploads/{archive.metadata.upload_id}/archive/{entry_id}#/data'
+        )
+        return SectionReference(reference=m_proxy_value)
+    def populate_monomers(
+        self, data_list: list[dict], archive: 'EntryArchive', logger: 'BoundLogger'
+    ) -> None:
+        """
+        For each monomer in the reaction, check if it exists in the database.
+        If it exists, create a reference to it.
+        If it does not exist, create a new monomer entry and create a reference to it.
+        """
+        self.monomers = []
+        for monomer_data in data_list:
+            smiles = monomer_data.get('smiles')
+            if not smiles:
+                logger.warning('Monomer data does not contain SMILES. Skipping.')
+                continue
+
+            monomer_section_reference = self.get_monomer_reference(
+                smiles, archive, logger
+            )
+            if monomer_section_reference is None:
+                monomer = Monomer()
+                monomer.smiles = smiles
+                # TODO: populate other monomer fields from monomer_data
+                monomer_section_reference = self.create_monomer_entry(
+                    f'monomer_{smiles}.archive.json', monomer, archive, logger
+                )
+            if monomer_section_reference is not None:
+                self.monomers.append(monomer_section_reference)
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         logger.info(

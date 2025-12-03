@@ -327,32 +327,6 @@ class PolymerizationReaction(Activity, Schema):
         )
         return m_proxy_value
 
-    def read_data_files(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
-        """
-        Read the data file and extract relevant data for the polymerization reaction.
-        """
-        data_dict = {}
-        if self.data_file:
-            if not self.data_file.endswith('.zip'):
-                logger.error('Data file must be a .zip file.')
-                return
-            folder_path = self.data_file.rsplit('.zip', 1)[0]
-            polymerization_reaction_file_regex = r'polymerization_reaction.*\.json'
-            monomer_file_regex = r'monomer_.*\.json'
-
-            for path in os.listdir(folder_path):
-                if re.match(polymerization_reaction_file_regex, path):
-                    file_path = os.path.join(folder_path, path)
-                    with archive.m_context(file_path, 'r') as f:
-                        data_dict['polymerization_reaction'] = json.load(f)
-                elif re.match(monomer_file_regex, path):
-                    file_path = os.path.join(folder_path, path)
-                    with archive.m_context(file_path, 'r') as f:
-                        if 'monomers' not in data_dict:
-                            data_dict['monomers'] = []
-                        data_dict['monomers'].append(json.load(f))
-        return data_dict
-
     def normalize_monomers(
         self, archive: 'EntryArchive', logger: 'BoundLogger'
     ) -> None:
@@ -387,20 +361,6 @@ class PolymerizationReaction(Activity, Schema):
             if monomer_m_proxy is not None:
                 monomer.reference = monomer_m_proxy
                 monomer.normalize(archive, logger)
-
-    def populate_archive(
-        self, data: dict, archive: 'EntryArchive', logger: 'BoundLogger'
-    ) -> None:
-        """
-        Populate the archive with the polymerization reaction data.
-        """
-        reaction_conditions = ReactionConditions()
-
-        reaction_conditions.polymerization_type = data.get('polymerization_type')
-        # TODO: populate other reaction conditions fields from data
-        reaction_conditions.normalize(archive, logger)
-
-        self.reaction_conditions = reaction_conditions
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         if not self.name:

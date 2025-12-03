@@ -205,6 +205,14 @@ class Monomer(PureSubstance, Schema):
 
 
 class PolymerizationReaction(Activity, Schema):
+    data_file = Quantity(
+        type=str,
+        description='Data file (.zip) containing multiple JSON files with '
+        'polymerization reaction and monomers data.',
+        a_eln=ELNAnnotation(
+            component=ELNComponentEnum.FileEditQuantity,
+        ),
+    )
     monomers = SubSection(
         description='Reference to the monomers used in the polymerization reaction.',
         section_def=SectionReference,
@@ -217,14 +225,6 @@ class PolymerizationReaction(Activity, Schema):
     publication_reference = SubSection(
         description='Reference to the publication containing the data.',
         section_def=PublicationReference,
-    )
-    data_file = Quantity(
-        type=str,
-        description='Data file (.zip) containing multiple JSON files with '
-        'polymerization reaction and monomers data.',
-        a_eln=ELNAnnotation(
-            component=ELNComponentEnum.FileEditQuantity,
-        ),
     )
     reaction_conditions = SubSection(section_def=ReactionConditions)
 

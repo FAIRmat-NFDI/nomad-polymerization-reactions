@@ -192,6 +192,16 @@ class Monomer(PureSubstance, Schema):
         section_def=XTBFeatures,
     )
 
+    def generate_visualization(
+        self, archive: 'EntryArchive', logger: 'BoundLogger'
+    ) -> None:
+        """
+        Generate visualization for the monomer based on its calculated atomic features
+        of the best conformer.
+        """
+        # TODO: implement visualization generation
+        pass
+
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         self.components = []
         self.elemental_composition = []
@@ -201,6 +211,7 @@ class Monomer(PureSubstance, Schema):
             pure_substance.normalize(archive, logger)
         if pure_substance:
             self.pure_substance = pure_substance
+        self.generate_visualization(archive, logger)
         super().normalize(archive, logger)
 
 

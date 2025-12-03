@@ -215,18 +215,24 @@ class Monomer(PureSubstance, Schema):
         super().normalize(archive, logger)
 
 
-class PolymerizationReaction(Activity, Schema):
-    data_file = Quantity(
+class MonomerReference(SectionReference):
+    """
+    A reference to a Monomer section.
+    """
+
+    smiles = Quantity(
         type=str,
-        description='Data file (.zip) containing multiple JSON files with '
-        'polymerization reaction and monomers data.',
+        description='SMILES representation of the referenced monomer.',
         a_eln=ELNAnnotation(
-            component=ELNComponentEnum.FileEditQuantity,
+            component=ELNComponentEnum.StringEditQuantity,
         ),
     )
+
+
+class PolymerizationReaction(Activity, Schema):
     monomers = SubSection(
         description='Reference to the monomers used in the polymerization reaction.',
-        section_def=SectionReference,
+        section_def=MonomerReference,
         repeats=True,
     )
     polymer = SubSection(
@@ -241,10 +247,10 @@ class PolymerizationReaction(Activity, Schema):
 
     def get_monomer_reference(
         self, smiles: str, archive: 'EntryArchive', logger: 'BoundLogger'
-    ) -> SectionReference | None:
+    ) -> str | None:
         """
         Looks for an existing monomer entry with the given SMILES and returns its
-        proxy value wrapped in a `SectionReference`.
+        proxy value.
         If found, it returns a reference to the entry.
         If no entry is found, logs a warning and returns None.
         If multiple entries are found, logs a warning and returns the first one.
@@ -261,8 +267,8 @@ class PolymerizationReaction(Activity, Schema):
             query={
                 'search_quantities': {
                     'id': (
-                        'data.smiles#nomad_polymerization_reactions.schema_'
-                        'packages.polymerization.Monomer'
+                        'data.smiles#nomad_polymerization_reactions.schema_packages'
+                        '.polymerization.Monomer'
                     ),
                     'str_value': f'{smiles}',
                 }
@@ -279,12 +285,14 @@ class PolymerizationReaction(Activity, Schema):
                 f'Multiple monomers found with the SMILES "{smiles}". Using the first '
                 'one.'
             )
+            # TODO: better handling in case of multiple entries?
+            # Limit to the same upload?
 
         upload_id = search_result[0]['upload_id']
         entry_id = search_result[0]['entry_id']
         m_proxy_value = f'../uploads/{upload_id}/archive/{entry_id}#/data'
 
-        return SectionReference(reference=m_proxy_value)
+        return m_proxy_value
 
     def create_monomer_entry(
         self,
@@ -292,10 +300,9 @@ class PolymerizationReaction(Activity, Schema):
         monomer: Monomer,
         archive: 'EntryArchive',
         logger: 'BoundLogger',
-    ) -> SectionReference | None:
+    ) -> str | None:
         """
-        Create a new monomer entry in the current Upload and return its proxy value
-        wrapped in a `SectionReference`.
+        Create a new monomer entry in the current Upload and return its proxy value.
         """
         from nomad.datamodel.context import ServerContext
         from nomad.utils import hash as m_hash
@@ -318,7 +325,7 @@ class PolymerizationReaction(Activity, Schema):
         m_proxy_value = (
             f'../uploads/{archive.metadata.upload_id}/archive/{entry_id}#/data'
         )
-        return SectionReference(reference=m_proxy_value)
+        return m_proxy_value
 
     def read_data_files(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         """
@@ -346,33 +353,40 @@ class PolymerizationReaction(Activity, Schema):
                         data_dict['monomers'].append(json.load(f))
         return data_dict
 
-    def populate_monomers(
-        self, data_list: list[dict], archive: 'EntryArchive', logger: 'BoundLogger'
+    def normalize_monomers(
+        self, archive: 'EntryArchive', logger: 'BoundLogger'
     ) -> None:
         """
         For each monomer in the reaction, check if it exists in the database.
         If it exists, create a reference to it.
         If it does not exist, create a new monomer entry and create a reference to it.
         """
-        self.monomers = []
-        for monomer_data in data_list:
-            smiles = monomer_data.get('smiles')
-            if not smiles:
+        for monomer in self.monomers:
+            monomer: MonomerReference
+            if not monomer.smiles:
                 logger.warning('Monomer data does not contain SMILES. Skipping.')
                 continue
 
-            monomer_section_reference = self.get_monomer_reference(
-                smiles, archive, logger
+            monomer_m_proxy = self.get_monomer_reference(
+                monomer.smiles, archive, logger
             )
-            if monomer_section_reference is None:
-                monomer = Monomer()
-                monomer.smiles = smiles
-                # TODO: populate other monomer fields from monomer_data
-                monomer_section_reference = self.create_monomer_entry(
-                    f'monomer_{smiles}.archive.json', monomer, archive, logger
+            if monomer_m_proxy is None:
+                logger.info(
+                    f'Creating new monomer entry for SMILES "{monomer.smiles}".'
                 )
-            if monomer_section_reference is not None:
-                self.monomers.append(monomer_section_reference)
+                new_monomer = Monomer()
+                new_monomer.name = monomer.name
+                new_monomer.smiles = monomer.smiles
+                monomer_m_proxy = self.create_monomer_entry(
+                    f'{monomer.smiles}.archive.json',
+                    # TODO: use monomer name for archive name?
+                    new_monomer,
+                    archive,
+                    logger,
+                )
+            if monomer_m_proxy is not None:
+                monomer.reference = monomer_m_proxy
+                monomer.normalize(archive, logger)
 
     def populate_archive(
         self, data: dict, archive: 'EntryArchive', logger: 'BoundLogger'
@@ -389,11 +403,10 @@ class PolymerizationReaction(Activity, Schema):
         self.reaction_conditions = reaction_conditions
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
-        data_dict = self.read_data_files(archive, logger)
-        if 'monomers' in data_dict:
-            self.populate_monomers(data_dict['monomers'], archive, logger)
-        if 'polymerization_reaction' in data_dict:
-            self.populate_archive(data_dict['polymerization_reaction'], archive, logger)
+        if not self.name:
+            self.name = 'Polymerization Reaction'
+            # TODO: more descriptive name?
+        self.normalize_monomers(archive, logger)
         super().normalize(archive, logger)
 
 

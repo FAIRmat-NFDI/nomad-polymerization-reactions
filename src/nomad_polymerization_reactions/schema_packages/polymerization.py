@@ -1,3 +1,6 @@
+import json
+import os
+import re
 from typing import (
     TYPE_CHECKING,
 )
@@ -13,7 +16,7 @@ from nomad.datamodel.metainfo.basesections import (
     PubChemPureSubstanceSection,
     PublicationReference,
 )
-from nomad.datamodel.metainfo.basesections.v1 import PureSubstance
+from nomad.datamodel.metainfo.basesections.v1 import PureSubstance, SectionReference
 from nomad.metainfo import MEnum, Quantity, SchemaPackage, SubSection
 from nomad.metainfo.metainfo import Section
 
@@ -215,14 +218,14 @@ class PolymerizationReaction(Activity, Schema):
         description='Reference to the publication containing the data.',
         section_def=PublicationReference,
     )
-    data_file_name = Quantity(
+    data_file = Quantity(
         type=str,
-        description='Data file containing the extracted data.',
+        description='Data file (.zip) containing multiple JSON files with '
+        'polymerization reaction and monomers data.',
         a_eln=ELNAnnotation(
-            component=ELNComponentEnum.StringEditQuantity,
+            component=ELNComponentEnum.FileEditQuantity,
         ),
     )
-
     reaction_conditions = SubSection(section_def=ReactionConditions)
 
     def get_monomer_reference(
@@ -305,6 +308,33 @@ class PolymerizationReaction(Activity, Schema):
             f'../uploads/{archive.metadata.upload_id}/archive/{entry_id}#/data'
         )
         return SectionReference(reference=m_proxy_value)
+
+    def read_data_files(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
+        """
+        Read the data file and extract relevant data for the polymerization reaction.
+        """
+        data_dict = {}
+        if self.data_file:
+            if not self.data_file.endswith('.zip'):
+                logger.error('Data file must be a .zip file.')
+                return
+            folder_path = self.data_file.rsplit('.zip', 1)[0]
+            polymerization_reaction_file_regex = r'polymerization_reaction.*\.json'
+            monomer_file_regex = r'monomer_.*\.json'
+
+            for path in os.listdir(folder_path):
+                if re.match(polymerization_reaction_file_regex, path):
+                    file_path = os.path.join(folder_path, path)
+                    with archive.m_context(file_path, 'r') as f:
+                        data_dict['polymerization_reaction'] = json.load(f)
+                elif re.match(monomer_file_regex, path):
+                    file_path = os.path.join(folder_path, path)
+                    with archive.m_context(file_path, 'r') as f:
+                        if 'monomers' not in data_dict:
+                            data_dict['monomers'] = []
+                        data_dict['monomers'].append(json.load(f))
+        return data_dict
+
     def populate_monomers(
         self, data_list: list[dict], archive: 'EntryArchive', logger: 'BoundLogger'
     ) -> None:
@@ -333,16 +363,26 @@ class PolymerizationReaction(Activity, Schema):
             if monomer_section_reference is not None:
                 self.monomers.append(monomer_section_reference)
 
+    def populate_archive(
+        self, data: dict, archive: 'EntryArchive', logger: 'BoundLogger'
+    ) -> None:
+        """
+        Populate the archive with the polymerization reaction data.
+        """
+        reaction_conditions = ReactionConditions()
+
+        reaction_conditions.polymerization_type = data.get('polymerization_type')
+        # TODO: populate other reaction conditions fields from data
+        reaction_conditions.normalize(archive, logger)
+
+        self.reaction_conditions = reaction_conditions
+
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
-        logger.info(
-            'PolymerizationReaction.normalize', parameter=configuration.parameter
-        )
-        if self.monomers is not None:
-            if self.polymer is None:
-                self.polymer = CompositeSystem()
-            self.polymer.components = self.monomers
-            self.polymer.elemental_composition = []
-            self.polymer.normalize(archive, logger)
+        data_dict = self.read_data_files(archive, logger)
+        if 'monomers' in data_dict:
+            self.populate_monomers(data_dict['monomers'], archive, logger)
+        if 'polymerization_reaction' in data_dict:
+            self.populate_archive(data_dict['polymerization_reaction'], archive, logger)
         super().normalize(archive, logger)
 
 

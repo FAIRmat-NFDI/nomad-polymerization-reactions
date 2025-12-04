@@ -4,6 +4,11 @@ import json
 from ase.data import chemical_symbols
 from nomad.units import ureg
 
+from nomad_polymerization_reactions.models import (
+    MonomerInput,
+    PolymerizationReactionInput,
+)
+
 
 def generate_pr_archive_from_json(  # noqa: PLR0912, PLR0915
     filepath: str, same_dir_as_input: bool = False
@@ -45,6 +50,9 @@ def generate_pr_archive_from_json(  # noqa: PLR0912, PLR0915
 
     with open(filepath, encoding='utf-8') as f:
         file_dict = json.load(f)
+
+    # Validate input JSON
+    _ = PolymerizationReactionInput(**file_dict)
 
     data_dict_ordered = collections.OrderedDict()
 
@@ -170,6 +178,9 @@ def generate_monomer_archive_from_json(filepath: str, same_dir_as_input: bool = 
     """
     with open(filepath, encoding='utf-8') as f:
         file_dict = json.load(f)
+
+    # Validate input JSON
+    _ = MonomerInput(**file_dict)
 
     data_dict = {}
 

@@ -4,7 +4,6 @@ from typing import (
 
 import numpy as np
 from ase.data import chemical_symbols
-from nomad.config import config
 from nomad.datamodel.data import ArchiveSection, Schema
 from nomad.datamodel.metainfo.annotations import ELNAnnotation, ELNComponentEnum
 from nomad.datamodel.metainfo.basesections import (
@@ -24,9 +23,6 @@ if TYPE_CHECKING:
     from structlog.stdlib import (
         BoundLogger,
     )
-configuration = config.get_plugin_entry_point(
-    'nomad_polymerization_reactions.schema_packages:polymerization'
-)
 
 m_package = SchemaPackage()
 

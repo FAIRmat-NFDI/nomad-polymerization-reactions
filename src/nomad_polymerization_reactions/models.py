@@ -53,6 +53,8 @@ class PolymerizationReactionInput(BaseModel):
 
 
 class MonomerInput(BaseModel):
+    name: str = Field(..., description='Name of the monomer.')
+    description: str | None = Field(None, description='Description of the monomer.')
     smiles: str | None = Field(None, description='SMILES string for the monomer.')
     best_conformer_coordinates: (
         list[conlist(float, min_length=3, max_length=3)] | None
@@ -101,5 +103,3 @@ class MonomerInput(BaseModel):
         description='Fukui radical values per atom. Dict key is atom index, value is '
         'Fukui radical.',
     )
-    name: str | None = Field(None, description='Name of the monomer.')
-    description: str | None = Field(None, description='Description of the monomer.')

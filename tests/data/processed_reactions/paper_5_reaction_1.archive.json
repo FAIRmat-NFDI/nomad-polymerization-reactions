@@ -1,0 +1,26 @@
+{
+    "data": {
+        "m_def": "nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction",
+        "publication_reference": {
+            "DOI_number": "https://doi.org/10.1016/0014-3057(94)00111-1"
+        },
+        "logP": 0.38710000000000006,
+        "monomers": [
+            {
+                "name": "Methyl Methacrylate",
+                "smiles": "C=C(C)C(=O)OC"
+            },
+            {
+                "name": "Methacrylic Acid",
+                "smiles": "C=C(C)C(=O)O"
+            }
+        ],
+        "reaction_conditions": {
+            "temperature": 343.15,
+            "solvent": {
+                "name": "CC(C)O"
+            },
+            "method": "solvent"
+        }
+    }
+}

@@ -13,6 +13,10 @@
             {
                 "name": "Methacrylic Acid",
                 "smiles": "C=C(C)C(=O)O"
+            },
+            {
+                "name": "Benzonitrile",
+                "smiles": "[C-]#[N+]c1ccccc1C"
             }
         ],
         "reaction_conditions": {

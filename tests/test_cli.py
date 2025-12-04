@@ -1,6 +1,6 @@
-import glob
 import os
 
+import pytest
 from click.testing import CliRunner
 
 from nomad_polymerization_reactions.cli import cli
@@ -17,20 +17,38 @@ def test_cli_help():
     assert 'This is the entry point to nomad-polymerization-reactions' in result.output
 
 
-def test_create_archive_help():
-    result = invoke_cli(cli, ['create-archive', '--help'])
+def test_archive_help():
+    result = invoke_cli(cli, ['archive', '--help'])
     assert result.exit_code == 0
     assert 'Usage' in result.output
-    assert 'Create an archive from a JSON file' in result.output
-
-
-def test_create_archive_success():
-    files = glob.glob('tests/data/processed_reactions/*.json')
-    result = invoke_cli(cli, ['create-archive', *files])
-    assert result.exit_code == 0
     assert (
-        'Archive created successfully.\nArchive created successfully.\n'
+        'Generate an archive or archives from the specified JSON files or directories.'
         in result.output
     )
-    for file in files:
-        os.remove(file.split('/')[-1].replace('.json', '.archive.yaml'))
+
+
+@pytest.mark.parametrize(
+    'filepath',
+    [
+        'tests/data/jsons/monomer_1.json',
+    ],
+)
+def test_archive_monomer(filepath):
+    result = invoke_cli(cli, ['archive', filepath])
+    assert result.exit_code == 0
+    assert 'Monomer archive created at:' in result.output
+    os.remove(filepath.split('/')[-1].replace('.json', '.archive.json'))
+
+
+@pytest.mark.parametrize(
+    'filepath',
+    [
+        'tests/data/jsons/polymerization_reaction_1.json',
+        'tests/data/jsons/polymerization_reaction_2.json',
+    ],
+)
+def test_archive_polymerization_reactions(filepath):
+    result = invoke_cli(cli, ['archive', filepath, '--mode', 'polymerization'])
+    assert result.exit_code == 0
+    assert 'Polymerization reaction archive created at:' in result.output
+    os.remove(filepath.split('/')[-1].replace('.json', '.archive.json'))

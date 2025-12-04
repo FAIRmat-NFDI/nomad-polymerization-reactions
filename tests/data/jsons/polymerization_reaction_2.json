@@ -2,8 +2,10 @@
     "file": "paper_5.json",
     "monomer1_s": "C=C(C)C(=O)OC",
     "monomer2_s": "C=C(C)C(=O)O",
+    "monomer3_s": "[C-]#[N+]c1ccccc1C",
     "monomer1": "Methyl Methacrylate",
     "monomer2": "Methacrylic Acid",
+    "monomer3": "Benzonitrile",
     "r_values": {
         "constant_1": 0.63,
         "constant_2": 0.25

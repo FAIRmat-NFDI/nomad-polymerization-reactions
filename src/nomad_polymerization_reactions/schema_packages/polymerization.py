@@ -217,9 +217,17 @@ class Monomer(PureSubstance, Schema):
 
 class MonomerReference(SectionReference):
     """
-    A reference to a Monomer section.
+    A reference to a Monomer entry section.
     """
 
+    reference = Quantity(
+        type=Monomer,
+        description='A reference to a Monomer entry section.',
+        a_eln=ELNAnnotation(
+            component='ReferenceEditQuantity',
+            label='monomer reference',
+        ),
+    )
     smiles = Quantity(
         type=str,
         description='SMILES representation of the referenced monomer.',
@@ -230,6 +238,10 @@ class MonomerReference(SectionReference):
 
 
 class PolymerizationReaction(Activity, Schema):
+    """
+    Schema for polymerization reaction data.
+    """
+
     monomers = SubSection(
         description='Reference to the monomers used in the polymerization reaction.',
         section_def=MonomerReference,

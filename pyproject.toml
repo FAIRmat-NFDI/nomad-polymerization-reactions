@@ -91,6 +91,7 @@ select = [
 
 ignore = [
     "F403", # 'from module import *' used; unable to detect undefined names
+    "PLC0415", # `import` should be at the top of the file
 ]
 
 fixable = ["ALL"]

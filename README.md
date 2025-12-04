@@ -9,7 +9,7 @@ polymerization data extracted from publications.
 ## Installation
 
 Install the package in your local environment with pip:
-```sh
+```bash
 pip install git+https://github.com/FAIRmat-NFDI/nomad-polymerization-reactions.git
 ```
 
@@ -27,31 +27,31 @@ NOMAD once uploaded. The `m_def` key in the archives helps NOMAD to identify whi
 
 Here's how you can convert a JSON file into an NOMAD entry archive that uses
 `nomad_polymerization_reactions.schema_packages.polymerization.Monomer` schema:
-```sh
+```bash
 nomad-polymerization archive monomer.json
 ```
 
 If you want to create an archive that uses "nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction" schema, use the `polymerization` mode:
-```sh
+```bash
 nomad-polymerization archive polymerization_reaction.json --mode polymerization
 ```
 
 You can specify multiple filepaths in the same command or even use directory
 paths. All the `.json` files in the directory will be transformed into archives:
-```sh
+```bash
 nomad-polymerization archive /folder/polymerization/ --mode polymerization
 ```
 
 By default, the command will create the archives in the same directory where it
 runs. If you want to create them in the same directory as the JSON file, use
 the flag `same-dir`:
-```sh
+```bash
 nomad-polymerization archive /folder/sub-folder/monomer.json --same-dir
 # creates `monomer.archive.json` file in `/folder/sub-folder/`
 ```
 
 The JSON files used for transformation should have a fixed format.
-You can find the data models for JSON files [here](https://github.com/FAIRmat-NFDI/nomad-polymerization-reactions/blob/main/nomad_polymerization_reactions/src/models.py).
+You can find the data models for JSON files [here](https://github.com/FAIRmat-NFDI/nomad-polymerization-reactions/blob/main/src/nomad_polymerization_reactions/models.py).
 
 
 ### License

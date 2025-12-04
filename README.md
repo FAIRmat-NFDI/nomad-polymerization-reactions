@@ -33,17 +33,20 @@ nomad-polymerization archive monomer.json
 
 If you want to create an archive that uses "nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction" schema, use the `polymerization` mode:
 ```sh
-nomad-polymerization archive --mode polymerization polymerization_reaction.json
+nomad-polymerization archive polymerization_reaction.json --mode polymerization
 ```
 
 You can specify multiple filepaths in the same command or even use directory
-paths. All the `.json` files in the directory will be transformed into archives.
+paths. All the `.json` files in the directory will be transformed into archives:
+```sh
+nomad-polymerization archive /folder/polymerization/ --mode polymerization
+```
 
 By default, the command will create the archives in the same directory where it
 runs. If you want to create them in the same directory as the JSON file, use
 the flag `same-dir`:
 ```sh
-nomad-polymerization archive --same-dir /folder/sub-folder/monomer.json
+nomad-polymerization archive /folder/sub-folder/monomer.json --same-dir
 # creates `monomer.archive.json` file in `/folder/sub-folder/`
 ```
 

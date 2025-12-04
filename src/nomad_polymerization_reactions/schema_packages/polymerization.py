@@ -349,8 +349,11 @@ class PolymerizationReaction(Activity, Schema):
                 new_monomer = Monomer()
                 new_monomer.name = monomer.name
                 new_monomer.smiles = monomer.smiles
+                archive_name = (
+                    f'monomer_{monomer.name.replace(" ", "_").lower()}.archive.json'
+                )
                 monomer_m_proxy = self.create_monomer_entry(
-                    f'{monomer.name}.archive.json',
+                    archive_name,
                     new_monomer,
                     archive,
                     logger,

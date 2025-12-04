@@ -29,6 +29,7 @@ maintainers = [
 license = { file = "LICENSE" }
 dependencies = [
     "nomad-lab>=1.4.0",
+    "pydantic",
 ]
 
 [project.urls]

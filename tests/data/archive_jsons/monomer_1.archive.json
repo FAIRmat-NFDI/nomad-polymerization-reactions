@@ -1,6 +1,7 @@
 {
     "data": {
         "m_def": "nomad_polymerization_reactions.schema_packages.polymerization.Monomer",
+        "name": "Benzonitrile",
         "smiles": "[C-]#[N+]c1ccccc1C",
         "xtb_features": {
             "energy": -23.540149986321136,

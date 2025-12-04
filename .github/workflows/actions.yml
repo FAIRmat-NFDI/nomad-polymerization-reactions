@@ -41,7 +41,7 @@ jobs:
     needs: build-and-install
     strategy:
       matrix:
-        test-type: [test_schemas, test_utils, test_cli]
+        test-type: [test_apps, test_schemas, test_utils, test_cli]
     steps:
     - uses: actions/checkout@v4
     - name: Set up Python 3.12

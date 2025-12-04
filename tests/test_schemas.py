@@ -3,7 +3,7 @@ import os.path
 from nomad.client import normalize_all, parse
 
 
-def test_schema():
+def test_polymerization_reaction():
     test_file = os.path.join(
         'tests', 'data', 'test_polymerization_reaction.archive.yaml'
     )

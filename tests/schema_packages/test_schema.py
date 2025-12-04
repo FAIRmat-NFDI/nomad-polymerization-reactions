@@ -18,4 +18,4 @@ def test_schema():
         entry_archive.data.publication_reference.publication_title
         == 'Synthesis and characterization of a rubber incorporated polyamideimide'
     )
-    assert entry_archive.data.monomers[0].pure_substance.name == 'Methacrylic acid'
+    assert entry_archive.data.monomers[0].name == 'Methacrylic acid'

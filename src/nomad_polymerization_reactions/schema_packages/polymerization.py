@@ -196,6 +196,9 @@ class Monomer(PureSubstance, Schema):
         pass
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
+        if not self.name:
+            self.name = 'Monomer'
+        # TODO: more descriptive name?
         self.components = []
         self.elemental_composition = []
         pure_substance = None

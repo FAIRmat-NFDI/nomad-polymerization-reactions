@@ -270,13 +270,8 @@ class PolymerizationReaction(Activity, Schema):
         search_result = search(
             owner='visible',
             query={
-                'search_quantities': {
-                    'id': (
-                        'data.smiles#nomad_polymerization_reactions.schema_packages'
-                        '.polymerization.Monomer'
-                    ),
-                    'str_value': f'{smiles}',
-                }
+                'data.smiles#nomad_polymerization_reactions.schema_packages.'
+                'polymerization.Monomer': smiles
             },
             user_id=archive.metadata.main_author.user_id,
         ).data

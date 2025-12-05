@@ -196,6 +196,9 @@ class Monomer(PureSubstance, Schema):
         pass
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
+        if not self.name:
+            self.name = 'Monomer'
+        # TODO: more descriptive name?
         self.components = []
         self.elemental_composition = []
         pure_substance = None
@@ -282,8 +285,8 @@ class PolymerizationReaction(Activity, Schema):
 
         if len(search_result) > 1:
             logger.warning(
-                f'Multiple monomers found with the SMILES "{smiles}". Using the first '
-                'one.'
+                f'Multiple monomers found with the SMILES "{smiles}". Using the '
+                'first one.'
             )
             # TODO: better handling in case of multiple entries?
             # Limit to the same upload?
@@ -348,12 +351,18 @@ class PolymerizationReaction(Activity, Schema):
                 logger.info(
                     f'Creating new monomer entry for SMILES "{monomer.smiles}".'
                 )
-                new_monomer = Monomer()
-                new_monomer.name = monomer.name
-                new_monomer.smiles = monomer.smiles
+                new_monomer = Monomer(name=monomer.name, smiles=monomer.smiles)
+                archive_name = (
+                    'monomer_'
+                    + (
+                        new_monomer.name.replace(' ', '_').lower()
+                        if new_monomer.name
+                        else new_monomer.smiles
+                    )
+                    + '.archive.json'
+                )
                 monomer_m_proxy = self.create_monomer_entry(
-                    f'{monomer.smiles}.archive.json',
-                    # TODO: use monomer name for archive name?
+                    archive_name,
                     new_monomer,
                     archive,
                     logger,

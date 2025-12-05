@@ -254,10 +254,10 @@ class PolymerizationReaction(Activity, Schema):
     reaction_conditions = SubSection(section_def=ReactionConditions)
 
     def get_monomer_reference(
-        self, name: str, archive: 'EntryArchive', logger: 'BoundLogger'
+        self, smiles: str, archive: 'EntryArchive', logger: 'BoundLogger'
     ) -> str | None:
         """
-        Looks for an existing monomer entry with the given name and returns its
+        Looks for an existing monomer entry with the given SMILES and returns its
         proxy value.
         If found, it returns a reference to the entry.
         If no entry is found, logs a warning and returns None.
@@ -280,12 +280,13 @@ class PolymerizationReaction(Activity, Schema):
         ).data
 
         if not search_result:
-            logger.warning(f'No monomer found with the name "{name}".')
+            logger.warning(f'No monomer found with the SMILES "{smiles}".')
             return None
 
         if len(search_result) > 1:
             logger.warning(
-                f'Multiple monomers found with the name "{name}". Using the first one.'
+                f'Multiple monomers found with the SMILES "{smiles}". Using the '
+                'first one.'
             )
             # TODO: better handling in case of multiple entries?
             # Limit to the same upload?
@@ -339,18 +340,26 @@ class PolymerizationReaction(Activity, Schema):
         """
         for monomer in self.monomers:
             monomer: MonomerReference
-            if not monomer.name:
-                logger.warning('Monomer data does not contain name. Skipping.')
+            if not monomer.smiles:
+                logger.warning('Monomer data does not contain SMILES. Skipping.')
                 continue
 
-            monomer_m_proxy = self.get_monomer_reference(monomer.name, archive, logger)
+            monomer_m_proxy = self.get_monomer_reference(
+                monomer.smiles, archive, logger
+            )
             if monomer_m_proxy is None:
-                logger.info(f'Creating new monomer entry for name "{monomer.name}".')
-                new_monomer = Monomer()
-                new_monomer.name = monomer.name
-                new_monomer.smiles = monomer.smiles
+                logger.info(
+                    f'Creating new monomer entry for SMILES "{monomer.smiles}".'
+                )
+                new_monomer = Monomer(name=monomer.name, smiles=monomer.smiles)
                 archive_name = (
-                    f'monomer_{monomer.name.replace(" ", "_").lower()}.archive.json'
+                    'monomer_'
+                    + (
+                        new_monomer.name.replace(' ', '_').lower()
+                        if new_monomer.name
+                        else new_monomer.smiles
+                    )
+                    + '.archive.json'
                 )
                 monomer_m_proxy = self.create_monomer_entry(
                     archive_name,

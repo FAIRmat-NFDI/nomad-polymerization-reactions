@@ -100,6 +100,9 @@ fixable = ["ALL"]
 # Allow unused variables when underscore-prefixed.
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
 
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["PLC0415"] # import-outside-top-level
+
 # this is entirely optional, you can remove this if you wish to
 [tool.ruff.format]
 # use single quotes for strings.

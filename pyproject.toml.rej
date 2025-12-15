@@ -1,0 +1,87 @@
+diff a/pyproject.toml b/pyproject.toml	(rejected hunks)
+@@ -7,17 +7,16 @@ classifiers = [
+     "Intended Audience :: Developers",
+     "Operating System :: OS Independent",
+     "Programming Language :: Python",
+-    "Programming Language :: Python :: 3.9",
+     "Programming Language :: Python :: 3.10",
+     "Programming Language :: Python :: 3.11",
+     "Programming Language :: Python :: 3.12",
+     "License :: OSI Approved :: Apache Software License",
+ ]
+-name = "nomad-nomad-polymerization-reactions"
++name = "nomad-polymerization-reactions"
+ description = "Nomad example template"
+ version = "0.1.0"
+ readme = "README.md"
+-requires-python = ">=3.9"
++requires-python = ">=3.10"
+ authors = [
+     { name = "Pepe Márquez", email = "jose.marquez@physik.hu-berlin.de" },
+ ]
+@@ -25,14 +24,32 @@ maintainers = [
+     { name = "Pepe Márquez", email = "jose.marquez@physik.hu-berlin.de" },
+ ]
+ license = { file = "LICENSE" }
+-dependencies = ["nomad-lab>=1.3.0"]
++dependencies = [
++    "nomad-lab>=1.4.0",
++    "pydantic",
++    "temporalio",
++]
+ 
+ [project.urls]
+-Repository = "https://github.com/Pepe-Marquez/nomad-nomad-polymerization-reactions"
++Repository = "https://github.com/Pepe-Marquez/nomad-polymerization-reactions"
+ 
+ [project.optional-dependencies]
+-dev = ["ruff", "pytest", "structlog"]
++dev = [
++    "ruff",
++    "pytest",
++    "structlog",
++    "mkdocs",
++    "mkdocs-material==8.1.1",
++    "pymdown-extensions",
++    "mkdocs-click",
++    "pytest-asyncio",
++]
+ 
++[tool.uv]
++extra-index-url = [
++  "https://gitlab.mpcdf.mpg.de/api/v4/projects/2187/packages/pypi/simple",
++]
++    
+ [tool.ruff]
+ # Exclude a variety of commonly ignored directories.
+ exclude = [
+@@ -74,12 +91,14 @@ select = [
+     "UP",
+     # isort
+     "I",
+-    # pylint 
++    # pylint
+     "PL",
+ ]
+ 
+ ignore = [
+     "F403", # 'from module import *' used; unable to detect undefined names
++    "PLC0415", # `import` should be at the top-level of a file
++    "E501", # line too long
+ ]
+ 
+ fixable = ["ALL"]
+@@ -109,9 +131,11 @@ where = ["src"]
+ 
+ [project.entry-points.'nomad.plugin']
+ 
+-mypackage = "nomad_nomad_polymerization_reactions.schema_packages:mypackage"
++schema_package_entry_point = "nomad_polymerization_reactions.schema_packages:schema_package_entry_point"
+ 
+-myapp = "nomad_nomad_polymerization_reactions.apps:myapp"
++app_entry_point = "nomad_polymerization_reactions.apps:app_entry_point"
++example_upload_entry_point = "nomad_polymerization_reactions.example_uploads:example_upload_entry_point"
++action_entry_point = "nomad_polymerization_reactions.actions:simple_action_entry_point"
+ [tool.cruft]
+ # Avoid updating workflow files, this leads to permissions issues
+ skip = [".github/*"]

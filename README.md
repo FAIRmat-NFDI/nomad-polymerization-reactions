@@ -2,9 +2,15 @@
  <img src="logo.png" />
 </p>
 
-A NOMAD plugin providing schemas, search apps, and data transformation utils for
+A NOMAD plugin providing schemas, search apps, and data transformation utilities for
 polymerization data extracted from publications.
 
+## Availability
+
+This plugin is hosted on [NOMAD's example Oasis](https://nomad-lab.eu/prod/v1/oasis/gui/). 
+You can use the built-in schemas `Monomer` and `PolymerizationReaction` to create entries.
+You can also use a dedicated search app to look up polymerization-specific entries 
+[here](https://nomad-lab.eu/prod/v1/oasis/gui/search/polymerization).
 
 ## Installation
 

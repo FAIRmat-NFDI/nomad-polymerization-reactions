@@ -4,8 +4,8 @@ permissions:
   contents: write
   pull-requests: write
 on:
-  schedule:
-    - cron: "0 14 * * 1" # Every Monday at 2pm (UTC time)
+  # schedule:
+  #   - cron: "0 14 * * 1" # Every Monday at 2pm (UTC time)
   workflow_dispatch:
 jobs:
   update:

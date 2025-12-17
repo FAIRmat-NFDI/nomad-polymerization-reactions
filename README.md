@@ -61,4 +61,4 @@ You can find the data models for JSON files [here](https://github.com/FAIRmat-NF
 
 
 ### License
-Distributed under the terms of the `Apache Software License 2.0`_ license, "nomad-nomad-polymerization-reactions" is free and open source software
+Distributed under the terms of the `Apache Software License 2.0` license, "nomad-polymerization-reactions" is free and open source software.

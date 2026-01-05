@@ -37,7 +37,7 @@ Here's how you can convert a JSON file into an NOMAD entry archive that uses
 nomad-polymerization archive monomer.json
 ```
 
-If you want to create an archive that uses "nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction" schema, use the `polymerization` mode:
+If you want to create an archive that uses `nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction` schema, use the `polymerization` mode:
 ```bash
 nomad-polymerization archive polymerization_reaction.json --mode polymerization
 ```
@@ -50,7 +50,7 @@ nomad-polymerization archive /folder/polymerization/ --mode polymerization
 
 By default, the command will create the archives in the same directory where it
 runs. If you want to create them in the same directory as the JSON file, use
-the flag `same-dir`:
+the flag `--same-dir`:
 ```bash
 nomad-polymerization archive /folder/sub-folder/monomer.json --same-dir
 # creates `monomer.archive.json` file in `/folder/sub-folder/`

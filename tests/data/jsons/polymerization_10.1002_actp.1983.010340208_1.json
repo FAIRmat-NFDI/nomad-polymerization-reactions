@@ -1,0 +1,37 @@
+{
+  "monomer1": "Acrylonitrile",
+  "monomer2": "Zinc acrylate",
+  "r_values": {
+    "constant_1": 0.44,
+    "constant_2": null
+  },
+  "conf_intervals": {
+    "constant_conf_1": 0.02,
+    "constant_conf_2": null
+  },
+  "temperature": 60.0,
+  "temperature_unit": "°C",
+  "solvent": "CN(C)C=O",
+  "method": "solvent",
+  "r-product": null,
+  "source": "https://doi.org/10.1002/actp.1983.010340208",
+  "calculation_method": "Kelen-Tudos",
+  "polymerization_type": "free radical",
+  "logP": -0.2956000000000001,
+  "monomer1_smiles": "C=CC#N",
+  "monomer2_smiles": "C=CC(=O)[O-].C=CC(=O)[O-].[Zn+2]",
+  "polytype_emb_1": 7.496725795633088,
+  "polytype_emb_2": -0.4631906941937577,
+  "method_emb_1": 6.958462891419976,
+  "method_emb_2": 6.651678436014861,
+  "solvent_logP": -0.2956000000000001,
+  "solvent_TPSA": 20.310000000000002,
+  "solvent_HBA": 1.0,
+  "solvent_HBD": 0.0,
+  "solvent_FractionCSP3": 0.6666666666666666,
+  "solvent_MolMR": 19.750999999999998,
+  "solvent_LabuteASA": 31.390491026869903,
+  "solvent_NumRotatableBonds": 1.0,
+  "solvent_RingCount": 0.0,
+  "solvent_HeavyAtomCount": 5.0
+}

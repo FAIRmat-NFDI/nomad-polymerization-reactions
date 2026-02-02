@@ -37,13 +37,58 @@ class ReactionConstant(ArchiveSection):
     )
 
 
+class SolventDescriptors(ArchiveSection):
+    """Molecular descriptors for the solvent."""
+    logP = Quantity(
+        type=np.dtype(np.float64),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    TPSA = Quantity(
+        type=np.dtype(np.float64),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    HBA = Quantity(
+        type=np.dtype(np.float64),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    HBD = Quantity(
+        type=np.dtype(np.float64),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    FractionCSP3 = Quantity(
+        type=np.dtype(np.float64),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    MolMR = Quantity(
+        type=np.dtype(np.float64),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    LabuteASA = Quantity(
+        type=np.dtype(np.float64),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    NumRotatableBonds = Quantity(
+        type=np.dtype(np.float64),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    RingCount = Quantity(
+        type=np.dtype(np.float64),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    HeavyAtomCount = Quantity(
+        type=np.dtype(np.float64),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+
+
 class ReactionConditions(ArchiveSection):
     polymerization_type = Quantity(
         type=str,
         a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity),
     )
     solvent = SubSection(section_def=PubChemPureSubstanceSection)
-    method = Quantity(
+    solvent_descriptors = SubSection(section_def=SolventDescriptors)
+    polymerization_method = Quantity(
         type=str, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)
     )
     temperature = Quantity(
@@ -51,10 +96,35 @@ class ReactionConditions(ArchiveSection):
         unit='K',
         a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
-    determination_method = Quantity(
+    temperature_unit = Quantity(
+        type=str,
+        a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity),
+    )
+    calculation_method = Quantity(
         type=str, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)
     )
     reaction_constants = SubSection(section_def=ReactionConstant, repeats=True)
+    # Embeddings
+    polytype_emb_1 = Quantity(
+        type=np.dtype(np.float64),
+        description='Polymerization type embedding dimension 1.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    polytype_emb_2 = Quantity(
+        type=np.dtype(np.float64),
+        description='Polymerization type embedding dimension 2.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    method_emb_1 = Quantity(
+        type=np.dtype(np.float64),
+        description='Method embedding dimension 1.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    method_emb_2 = Quantity(
+        type=np.dtype(np.float64),
+        description='Method embedding dimension 2.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
 
 
 class AtomicFeatures(ArchiveSection):
@@ -252,6 +322,11 @@ class PolymerizationReaction(Activity, Schema):
         section_def=PublicationReference,
     )
     reaction_conditions = SubSection(section_def=ReactionConditions)
+    r_product = Quantity(
+        type=np.dtype(np.float64),
+        description='Product of reactivity ratios.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
 
     def get_monomer_reference(
         self, smiles: str, archive: 'EntryArchive', logger: 'BoundLogger'

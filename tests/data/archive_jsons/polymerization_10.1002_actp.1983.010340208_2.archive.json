@@ -1,0 +1,54 @@
+{
+    "data": {
+        "m_def": "nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction",
+        "publication_reference": {
+            "DOI_number": "https://doi.org/10.1002/actp.1983.010340208"
+        },
+        "monomers": [
+            {
+                "name": "Acrylonitrile",
+                "smiles": "C=CC#N"
+            },
+            {
+                "name": "Zinc acrylate",
+                "smiles": "C=CC(=O)[O-].C=CC(=O)[O-].[Zn+2]"
+            }
+        ],
+        "reaction_conditions": {
+            "temperature_unit": "\u00b0C",
+            "temperature": 333.15,
+            "solvent": {
+                "smile": "CN(C)C=O"
+            },
+            "solvent_descriptors": {
+                "logP": -0.2956000000000001,
+                "TPSA": 20.310000000000002,
+                "HBA": 1.0,
+                "HBD": 0.0,
+                "FractionCSP3": 0.6666666666666666,
+                "MolMR": 19.750999999999998,
+                "LabuteASA": 31.390491026869903,
+                "NumRotatableBonds": 1.0,
+                "RingCount": 0.0,
+                "HeavyAtomCount": 5.0
+            },
+            "polymerization_method": "solvent",
+            "polymerization_type": "free radical",
+            "calculation_method": "Ghosh-Palit",
+            "reaction_constants": [
+                {
+                    "reaction_constant": 0.33,
+                    "reaction_constant_confi": 0.02
+                },
+                {
+                    "reaction_constant": 0.24,
+                    "reaction_constant_confi": 0.03
+                }
+            ],
+            "polytype_emb_1": 7.496725795633088,
+            "polytype_emb_2": -0.4631906941937577,
+            "method_emb_1": 6.958462891419976,
+            "method_emb_2": 6.651678436014861
+        }
+    }
+}

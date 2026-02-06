@@ -1,6 +1,5 @@
 import collections
 import json
-import os
 from typing import Any
 
 from ase.data import chemical_symbols
@@ -18,15 +17,17 @@ def generate_pr_archive_from_json(  # noqa: PLR0912, PLR0915
     """
     Generate an archive.json file for polymerization reactions from a JSON file.
 
-    All of the following keys are supported and copied into the archive when present:
+    All of the following keys are supported and copied into the archive when
+    present:
     monomer1, monomer2, monomer1_smiles, monomer2_smiles,
-    r_values (constant_1, constant_2), conf_intervals (constant_conf_1, constant_conf_2),
-    temperature, temperature_unit, solvent, polymerization_method, r-product, source,
-    calculation_method (fallback to determination_method), polymerization_type, logP (fallback for solvent_logP),
-    polytype_emb_1, polytype_emb_2, method_emb_1, method_emb_2,
-    solvent_logP, solvent_TPSA, solvent_HBA, solvent_HBD, solvent_FractionCSP3,
-    solvent_MolMR, solvent_LabuteASA, solvent_NumRotatableBonds, solvent_RingCount,
-    solvent_HeavyAtomCount.
+    r_values (constant_1, constant_2), conf_intervals (constant_conf_1,
+    constant_conf_2), temperature, temperature_unit, solvent,
+    polymerization_method, r-product, source,
+    calculation_method (fallback to determination_method), polymerization_type,
+    logP (fallback for solvent_logP), polytype_emb_1, polytype_emb_2,
+    method_emb_1, method_emb_2, solvent_logP, solvent_TPSA, solvent_HBA,
+    solvent_HBD, solvent_FractionCSP3, solvent_MolMR, solvent_LabuteASA,
+    solvent_NumRotatableBonds, solvent_RingCount, solvent_HeavyAtomCount.
 
     Args:
         filepath (str): Path to the JSON file.
@@ -55,8 +56,6 @@ def generate_pr_archive_from_json(  # noqa: PLR0912, PLR0915
                 .to('K')
                 .magnitude
             )
-            # Store original temperature unit
-            reaction_conditions['temperature_unit'] = temperature_unit_original
         reaction_conditions['temperature'] = temperature
     if file_dict.get('solvent', None) is not None:
         # solvent is always SMILES (e.g. "CN(C)C=O")
@@ -65,8 +64,21 @@ def generate_pr_archive_from_json(  # noqa: PLR0912, PLR0915
     solvent_descriptors: dict[str, Any] = {}
     solvent_logp = file_dict.get('solvent_logP') or file_dict.get('logP')
     if solvent_logp is not None:
-        solvent_descriptors['logP'] = solvent_logp
-    # Map solvent_* keys to descriptors (remove 'solvent_' prefix)
+        solvent_descriptors['log_P'] = solvent_logp
+    # Map solvent_* keys to descriptors (remove 'solvent_' prefix and convert
+    # to snake_case)
+    # Mapping from input key (after removing 'solvent_') to schema quantity name
+    descriptor_name_mapping: dict[str, str] = {
+        'TPSA': 'TPSA',
+        'HBA': 'HBA',
+        'HBD': 'HBD',
+        'FractionCSP3': 'fraction_CSP3',
+        'MolMR': 'mol_MR',
+        'LabuteASA': 'labute_ASA',
+        'NumRotatableBonds': 'num_rotatable_bonds',
+        'RingCount': 'ring_count',
+        'HeavyAtomCount': 'heavy_atom_count',
+    }
     for key in (
         'solvent_TPSA', 'solvent_HBA', 'solvent_HBD', 'solvent_FractionCSP3',
         'solvent_MolMR', 'solvent_LabuteASA', 'solvent_NumRotatableBonds',
@@ -74,7 +86,9 @@ def generate_pr_archive_from_json(  # noqa: PLR0912, PLR0915
     ):
         if file_dict.get(key) is not None:
             # Remove 'solvent_' prefix
-            descriptor_key = key.replace('solvent_', '')
+            input_key = key.replace('solvent_', '')
+            # Map to schema quantity name (snake_case)
+            descriptor_key = descriptor_name_mapping.get(input_key, input_key)
             solvent_descriptors[descriptor_key] = file_dict[key]
     if solvent_descriptors:
         reaction_conditions['solvent_descriptors'] = solvent_descriptors
@@ -149,15 +163,9 @@ def generate_pr_archive_from_json(  # noqa: PLR0912, PLR0915
     if same_dir_as_input:
         archive_path = filepath.replace('.json', '.archive.json')
     else:
-        # If input is from tests/data/jsons/, save to tests/data/archive_jsons/
-        if 'tests/data/jsons/' in filepath:
-            archive_dir = filepath.replace('tests/data/jsons/', 'tests/data/archive_jsons/')
-            archive_dir = os.path.dirname(archive_dir)
-            os.makedirs(archive_dir, exist_ok=True)
-            archive_filename = os.path.basename(filepath).replace('.json', '.archive.json')
-            archive_path = os.path.join(archive_dir, archive_filename)
-        else:
-            archive_path = filepath.split('/')[-1].replace('.json', '.archive.json')
+        archive_path = (
+            filepath.rsplit('/', maxsplit=1)[-1].replace('.json', '.archive.json')
+        )
     with open(archive_path, 'w', encoding='utf-8') as f:
         json.dump(entry, f, indent=4)
 
@@ -296,15 +304,9 @@ def generate_monomer_archive_from_json(  # noqa: PLR0912, PLR0915
     if same_dir_as_input:
         archive_path = filepath.replace('.json', '.archive.json')
     else:
-        # If input is from tests/data/jsons/, save to tests/data/archive_jsons/
-        if 'tests/data/jsons/' in filepath:
-            archive_dir = filepath.replace('tests/data/jsons/', 'tests/data/archive_jsons/')
-            archive_dir = os.path.dirname(archive_dir)
-            os.makedirs(archive_dir, exist_ok=True)
-            archive_filename = os.path.basename(filepath).replace('.json', '.archive.json')
-            archive_path = os.path.join(archive_dir, archive_filename)
-        else:
-            archive_path = filepath.split('/')[-1].replace('.json', '.archive.json')
+        archive_path = (
+            filepath.rsplit('/', maxsplit=1)[-1].replace('.json', '.archive.json')
+        )
 
     with open(archive_path, 'w', encoding='utf-8') as f:
         json.dump(entry, f, indent=4)

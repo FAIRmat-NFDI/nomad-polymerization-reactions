@@ -37,13 +37,7 @@ def test_archive_monomer(filepath):
     result = invoke_cli(cli, ['archive', filepath])
     assert result.exit_code == 0
     assert 'Monomer archive created at:' in result.output
-    # Verify the file was created (now in tests/data/archive_jsons/)
-    if 'tests/data/jsons/' in filepath:
-        archive_dir = filepath.replace('tests/data/jsons/', 'tests/data/archive_jsons/')
-        archive_dir = os.path.dirname(archive_dir)
-        archive_filename = os.path.basename(filepath).replace('.json', '.archive.json')
-        generated_file = os.path.join(archive_dir, archive_filename)
-        assert os.path.exists(generated_file), f'Archive file should be created at {generated_file}'
+    os.remove(filepath.split('/')[-1].replace('.json', '.archive.json'))
 
 
 @pytest.mark.parametrize(
@@ -57,10 +51,4 @@ def test_archive_polymerization_reactions(filepath):
     result = invoke_cli(cli, ['archive', filepath, '--mode', 'polymerization'])
     assert result.exit_code == 0
     assert 'Polymerization reaction archive created at:' in result.output
-    # Verify the file was created (now in tests/data/archive_jsons/)
-    if 'tests/data/jsons/' in filepath:
-        archive_dir = filepath.replace('tests/data/jsons/', 'tests/data/archive_jsons/')
-        archive_dir = os.path.dirname(archive_dir)
-        archive_filename = os.path.basename(filepath).replace('.json', '.archive.json')
-        generated_file = os.path.join(archive_dir, archive_filename)
-        assert os.path.exists(generated_file), f'Archive file should be created at {generated_file}'
+    os.remove(filepath.split('/')[-1].replace('.json', '.archive.json'))

@@ -22,8 +22,12 @@ class ConfIntervalsModel(BaseModel):
 class PolymerizationReactionInput(BaseModel):
     file: str | None = Field(None, description='Source filename (e.g. paper_0.json).')
 
-    monomer1_smiles: str | None = Field(None, description='SMILES string for monomer 1.')
-    monomer2_smiles: str | None = Field(None, description='SMILES string for monomer 2.')
+    monomer1_smiles: str | None = Field(
+        None, description='SMILES string for monomer 1.'
+    )
+    monomer2_smiles: str | None = Field(
+        None, description='SMILES string for monomer 2.'
+    )
     monomer1: str | None = Field(None, description='Name of monomer 1.')
     monomer2: str | None = Field(None, description='Name of monomer 2.')
     # TODO: there can be more than 2 monomers in a reaction. How to handle this?
@@ -57,7 +61,11 @@ class PolymerizationReactionInput(BaseModel):
         None, description="Type of polymerization (e.g., 'free radical')."
     )
     determination_method: str | None = Field(
-        None, description='Method used to determine reactivity constants (fallback for calculation_method if not provided).'
+        None,
+        description=(
+            'Method used to determine reactivity constants '
+            '(fallback for calculation_method if not provided).'
+        ),
     )
     logP: float | None = Field(
         None, description='LogP value (fallback for solvent_logP if not provided).'

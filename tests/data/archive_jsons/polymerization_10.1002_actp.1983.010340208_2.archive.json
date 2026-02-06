@@ -15,22 +15,21 @@
             }
         ],
         "reaction_conditions": {
-            "temperature_unit": "\u00b0C",
             "temperature": 333.15,
             "solvent": {
                 "smile": "CN(C)C=O"
             },
             "solvent_descriptors": {
-                "logP": -0.2956000000000001,
+                "log_P": -0.2956000000000001,
                 "TPSA": 20.310000000000002,
                 "HBA": 1.0,
                 "HBD": 0.0,
-                "FractionCSP3": 0.6666666666666666,
-                "MolMR": 19.750999999999998,
-                "LabuteASA": 31.390491026869903,
-                "NumRotatableBonds": 1.0,
-                "RingCount": 0.0,
-                "HeavyAtomCount": 5.0
+                "fraction_CSP3": 0.6666666666666666,
+                "mol_MR": 19.750999999999998,
+                "labute_ASA": 31.390491026869903,
+                "num_rotatable_bonds": 1.0,
+                "ring_count": 0.0,
+                "heavy_atom_count": 5.0
             },
             "polymerization_method": "solvent",
             "polymerization_type": "free radical",

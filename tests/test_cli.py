@@ -43,8 +43,8 @@ def test_archive_monomer(filepath):
 @pytest.mark.parametrize(
     'filepath',
     [
-        'tests/data/jsons/polymerization_reaction_1.json',
-        'tests/data/jsons/polymerization_reaction_2.json',
+        'tests/data/jsons/polymerization_10.1002_actp.1983.010340208_1.json',
+        'tests/data/jsons/polymerization_10.1002_actp.1983.010340208_2.json',
     ],
 )
 def test_archive_polymerization_reactions(filepath):

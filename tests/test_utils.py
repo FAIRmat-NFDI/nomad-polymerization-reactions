@@ -13,23 +13,23 @@ from nomad_polymerization_reactions.utils import (
     'filepath,reference',
     [
         (
-            'tests/data/jsons/polymerization_reaction_1.json',
-            'tests/data/archive_jsons/polymerization_reaction_1.archive.json',
+            'tests/data/jsons/polymerization_10.1002_actp.1983.010340208_1.json',
+            'tests/data/archive_jsons/polymerization_10.1002_actp.1983.010340208_1.archive.json',
         ),
         (
-            'tests/data/jsons/polymerization_reaction_2.json',
-            'tests/data/archive_jsons/polymerization_reaction_2.archive.json',
+            'tests/data/jsons/polymerization_10.1002_actp.1983.010340208_2.json',
+            'tests/data/archive_jsons/polymerization_10.1002_actp.1983.010340208_2.archive.json',
         ),
     ],
 )
 def test_generate_pr_archive_from_json(filepath, reference):
     output = generate_pr_archive_from_json(filepath)
     with open(reference, encoding='utf-8') as f:
-        reference = json.load(f)
-    assert output == reference
+        reference_data = json.load(f)
+    assert output == reference_data
 
     # remove the generated file
-    generated_file = f'{filepath.split("/")[-1].split(".")[0]}.archive.json'
+    generated_file = filepath.split('/')[-1].replace('.json', '.archive.json')
     os.remove(generated_file)
 
 
@@ -49,5 +49,5 @@ def test_generate_monomer_archive_from_json(filepath, reference):
     assert output == reference_data
 
     # remove the generated file
-    generated_file = f'{filepath.split("/")[-1].split(".")[0]}.archive.json'
+    generated_file = filepath.split('/')[-1].replace('.json', '.archive.json')
     os.remove(generated_file)

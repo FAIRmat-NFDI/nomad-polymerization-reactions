@@ -1,5 +1,6 @@
 import collections
 import json
+from typing import Any
 
 from ase.data import chemical_symbols
 from nomad.units import ureg
@@ -12,32 +13,21 @@ from nomad_polymerization_reactions.models import (
 
 def generate_pr_archive_from_json(  # noqa: PLR0912, PLR0915
     filepath: str, same_dir_as_input: bool = False
-):
+) -> dict:
     """
-    Generate an archive.json file for polymerization reactions from a JSON file of the
-    following format:
-    ```json
-    {
-        "monomer1_s": "C=C",
-        "monomer2_s": "C=O",
-        "monomer1": "ethylene",
-        "monomer2": "carbon monoxide",
-        "r_values": {
-            "constant_1": 22.0,
-            "constant_2": 0.0
-        },
-        "conf_intervals": {
-            "constant_conf_1": null,
-            "constant_conf_2": null
-        },
-        "temperature": 20.0,
-        "temperature_unit": "\u00b0C",
-        "solvent": null,
-        "method": "bulk",
-        "r-product": null,
-        "source": "https://doi.org/10.1002/pol.1963.110010415"
-    }
-    ```
+    Generate an archive.json file for polymerization reactions from a JSON file.
+
+    All of the following keys are supported and copied into the archive when
+    present:
+    monomer1, monomer2, monomer1_smiles, monomer2_smiles,
+    r_values (constant_1, constant_2), conf_intervals (constant_conf_1,
+    constant_conf_2), temperature, temperature_unit, solvent,
+    polymerization_method, r-product, source,
+    calculation_method (fallback to determination_method), polymerization_type,
+    logP (fallback for solvent_logP), polytype_emb_1, polytype_emb_2,
+    method_emb_1, method_emb_2, solvent_logP, solvent_TPSA, solvent_HBA,
+    solvent_HBD, solvent_FractionCSP3, solvent_MolMR, solvent_LabuteASA,
+    solvent_NumRotatableBonds, solvent_RingCount, solvent_HeavyAtomCount.
 
     Args:
         filepath (str): Path to the JSON file.
@@ -51,40 +41,110 @@ def generate_pr_archive_from_json(  # noqa: PLR0912, PLR0915
     with open(filepath, encoding='utf-8') as f:
         file_dict = json.load(f)
 
-    # Validate input JSON
-    _ = PolymerizationReactionInput(**file_dict)
+    # Validate input JSON (allow extra keys from full JSON format)
+    _ = PolymerizationReactionInput.model_validate(file_dict)
 
-    data_dict_ordered = collections.OrderedDict()
+    data_dict_ordered: collections.OrderedDict[str, Any] = collections.OrderedDict()
 
-    reaction_conditions = dict()
+    reaction_conditions: dict[str, Any] = {}
     if file_dict.get('temperature', None) is not None:
         temperature = file_dict['temperature']
-        if file_dict.get('temperature_unit', None) is not None:
+        temperature_unit_original = file_dict.get('temperature_unit')
+        if temperature_unit_original is not None:
             temperature = (
-                ureg.Quantity(temperature, file_dict['temperature_unit'])
-                .to('K')
-                .magnitude
+                ureg.Quantity(temperature, temperature_unit_original).to('K').magnitude
             )
         reaction_conditions['temperature'] = temperature
     if file_dict.get('solvent', None) is not None:
-        reaction_conditions['solvent'] = dict(name=file_dict['solvent'])
-    if file_dict.get('method', None) is not None:
-        reaction_conditions['method'] = file_dict['method']
+        # solvent is always SMILES (e.g. "CN(C)C=O")
+        reaction_conditions['solvent'] = {'smile': file_dict['solvent']}
+    # Solvent descriptors as separate subsection
+    solvent_descriptors: dict[str, Any] = {}
+    solvent_logp = file_dict.get('solvent_logP') or file_dict.get('logP')
+    if solvent_logp is not None:
+        solvent_descriptors['log_P'] = solvent_logp
+    # Map solvent_* keys to descriptors (remove 'solvent_' prefix and convert
+    # to snake_case)
+    # Mapping from input key (after removing 'solvent_') to schema quantity name
+    descriptor_name_mapping: dict[str, str] = {
+        'TPSA': 'TPSA',
+        'HBA': 'HBA',
+        'HBD': 'HBD',
+        'FractionCSP3': 'fraction_CSP3',
+        'MolMR': 'mol_MR',
+        'LabuteASA': 'labute_ASA',
+        'NumRotatableBonds': 'num_rotatable_bonds',
+        'RingCount': 'ring_count',
+        'HeavyAtomCount': 'heavy_atom_count',
+    }
+    for key in (
+        'solvent_TPSA',
+        'solvent_HBA',
+        'solvent_HBD',
+        'solvent_FractionCSP3',
+        'solvent_MolMR',
+        'solvent_LabuteASA',
+        'solvent_NumRotatableBonds',
+        'solvent_RingCount',
+        'solvent_HeavyAtomCount',
+    ):
+        if file_dict.get(key) is not None:
+            # Remove 'solvent_' prefix
+            input_key = key.replace('solvent_', '')
+            # Map to schema quantity name (snake_case)
+            descriptor_key = descriptor_name_mapping.get(input_key, input_key)
+            solvent_descriptors[descriptor_key] = file_dict[key]
+    if solvent_descriptors:
+        reaction_conditions['solvent_descriptors'] = solvent_descriptors
+    # polymerization_method with fallback to legacy key "method"
+    polymerization_method = file_dict.get('polymerization_method') or file_dict.get(
+        'method'
+    )
+    if polymerization_method is not None:
+        reaction_conditions['polymerization_method'] = polymerization_method
     if file_dict.get('polymerization_type', None) is not None:
         reaction_conditions['polymerization_type'] = file_dict['polymerization_type']
-    if file_dict.get('determination_method', None) is not None:
-        reaction_conditions['determination_method'] = file_dict['determination_method']
+    # calculation_method with fallback to determination_method (they are the same)
+    calc_method = file_dict.get('calculation_method') or file_dict.get(
+        'determination_method'
+    )
+    if calc_method is not None:
+        reaction_conditions['calculation_method'] = calc_method
+    # Reaction constants from r_values and conf_intervals
+    r_values = file_dict.get('r_values') or {}
+    conf_intervals = file_dict.get('conf_intervals') or {}
+    reaction_constants = []
+    for i in (1, 2):
+        r_key = f'constant_{i}'
+        c_key = f'constant_conf_{i}'
+        r_val = r_values.get(r_key) if r_values else None
+        c_val = conf_intervals.get(c_key) if conf_intervals else None
+        if r_val is not None or c_val is not None:
+            rc = {}
+            if r_val is not None:
+                rc['reaction_constant'] = r_val
+            if c_val is not None:
+                rc['reaction_constant_confi'] = c_val
+            if rc:
+                reaction_constants.append(rc)
+    if reaction_constants:
+        reaction_conditions['reaction_constants'] = reaction_constants
+    # Embeddings to reaction_conditions
+    for key in ('polytype_emb_1', 'polytype_emb_2', 'method_emb_1', 'method_emb_2'):
+        if file_dict.get(key) is not None:
+            reaction_conditions[key] = file_dict[key]
 
-    monomers = []
+    monomers: list[dict[str, str]] = []
     iterator = 1
     while True:
         if file_dict.get(f'monomer{iterator}', None) is None:
             break
 
-        monomer_dict = dict()
+        monomer_dict: dict[str, str] = {}
         monomer_dict['name'] = file_dict[f'monomer{iterator}']
-        if file_dict.get(f'monomer{iterator}_s', None) is not None:
-            monomer_dict['smiles'] = file_dict[f'monomer{iterator}_s']
+        smiles = file_dict.get(f'monomer{iterator}_smiles')
+        if smiles is not None:
+            monomer_dict['smiles'] = smiles
         monomers.append(monomer_dict)
         iterator += 1
 
@@ -97,19 +157,19 @@ def generate_pr_archive_from_json(  # noqa: PLR0912, PLR0915
         )
     if file_dict.get('r-product', None) is not None:
         data_dict_ordered['r_product'] = file_dict['r-product']
-    if file_dict.get('logP', None) is not None:
-        data_dict_ordered['logP'] = file_dict['logP']
     if monomers:
         data_dict_ordered['monomers'] = monomers
     if reaction_conditions:
         data_dict_ordered['reaction_conditions'] = reaction_conditions
 
-    data_dict = dict(data_dict_ordered)
-    entry = dict(data=data_dict)
+    data_dict: dict[str, Any] = dict(data_dict_ordered)
+    entry: dict[str, dict[str, Any]] = {'data': data_dict}
     if same_dir_as_input:
         archive_path = filepath.replace('.json', '.archive.json')
     else:
-        archive_path = filepath.split('/')[-1].replace('.json', '.archive.json')
+        archive_path = filepath.rsplit('/', maxsplit=1)[-1].replace(
+            '.json', '.archive.json'
+        )
     with open(archive_path, 'w', encoding='utf-8') as f:
         json.dump(entry, f, indent=4)
 
@@ -118,7 +178,9 @@ def generate_pr_archive_from_json(  # noqa: PLR0912, PLR0915
     return entry
 
 
-def generate_monomer_archive_from_json(filepath: str, same_dir_as_input: bool = False):  # noqa: PLR0912, PLR0915
+def generate_monomer_archive_from_json(  # noqa: PLR0912, PLR0915
+    filepath: str, same_dir_as_input: bool = False
+) -> dict:
     """
     Generate an archive.json file for monomers from a JSON file of the following format:
     ```json
@@ -182,7 +244,7 @@ def generate_monomer_archive_from_json(filepath: str, same_dir_as_input: bool = 
     # Validate input JSON
     _ = MonomerInput(**file_dict)
 
-    data_dict = {}
+    data_dict: dict[str, Any] = {}
 
     data_dict['m_def'] = (
         'nomad_polymerization_reactions.schema_packages.polymerization.Monomer'
@@ -193,7 +255,7 @@ def generate_monomer_archive_from_json(filepath: str, same_dir_as_input: bool = 
         data_dict['smiles'] = file_dict['smiles']
     if file_dict.get('description', None) is not None:
         data_dict['description'] = file_dict['description']
-    xtb_features = {}
+    xtb_features: dict[str, Any] = {}
     if file_dict.get('best_conformer_energy', None) is not None:
         xtb_features['energy'] = file_dict['best_conformer_energy']
     if file_dict.get('ip', None) is not None:
@@ -213,7 +275,7 @@ def generate_monomer_archive_from_json(filepath: str, same_dir_as_input: bool = 
     if file_dict.get('dipole', None) is not None:
         xtb_features['dipole_moment'] = file_dict['dipole']
 
-    atomic_features = []
+    atomic_features: list[dict[str, Any]] = []
     for positions, element in zip(
         file_dict.get('best_conformer_coordinates', []),
         file_dict.get('best_conformer_elements', []),
@@ -242,11 +304,13 @@ def generate_monomer_archive_from_json(filepath: str, same_dir_as_input: bool = 
     if xtb_features:
         data_dict['xtb_features'] = xtb_features
 
-    entry = dict(data=data_dict)
+    entry: dict[str, dict[str, Any]] = {'data': data_dict}
     if same_dir_as_input:
         archive_path = filepath.replace('.json', '.archive.json')
     else:
-        archive_path = filepath.split('/')[-1].replace('.json', '.archive.json')
+        archive_path = filepath.rsplit('/', maxsplit=1)[-1].replace(
+            '.json', '.archive.json'
+        )
 
     with open(archive_path, 'w', encoding='utf-8') as f:
         json.dump(entry, f, indent=4)

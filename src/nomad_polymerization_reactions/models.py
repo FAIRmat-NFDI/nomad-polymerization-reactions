@@ -20,8 +20,14 @@ class ConfIntervalsModel(BaseModel):
 
 
 class PolymerizationReactionInput(BaseModel):
-    monomer1_s: str | None = Field(None, description='SMILES string for monomer 1.')
-    monomer2_s: str | None = Field(None, description='SMILES string for monomer 2.')
+    file: str | None = Field(None, description='Source filename (e.g. paper_0.json).')
+
+    monomer1_smiles: str | None = Field(
+        None, description='SMILES string for monomer 1.'
+    )
+    monomer2_smiles: str | None = Field(
+        None, description='SMILES string for monomer 2.'
+    )
     monomer1: str | None = Field(None, description='Name of monomer 1.')
     monomer2: str | None = Field(None, description='Name of monomer 2.')
     # TODO: there can be more than 2 monomers in a reaction. How to handle this?
@@ -36,20 +42,66 @@ class PolymerizationReactionInput(BaseModel):
         None, description="Unit for reaction temperature (e.g., 'K', '°C')."
     )
     solvent: str | None = Field(None, description='Solvent used in the reaction.')
-    method: str | None = Field(
+    polymerization_method: str | None = Field(
         None, description="Polymerization method (e.g., 'bulk', 'solution')."
+    )
+    method: str | None = Field(
+        None,
+        description='Deprecated: fallback for polymerization_method if not provided.',
     )
     r_product: float | None = Field(
         None, alias='r-product', description='Product reactivity ratio.'
     )
     source: str | None = Field(None, description='Source or DOI for the reaction data.')
+    calculation_method: str | None = Field(
+        None,
+        description='Method used to determine reactivity constants (e.g. Kelen-Tudos).',
+    )
     polymerization_type: str | None = Field(
-        None, description="Type of polymerization (e.g., 'copolymerization')."
+        None, description="Type of polymerization (e.g., 'free radical')."
     )
     determination_method: str | None = Field(
-        None, description='Method used to determine reactivity constants.'
+        None,
+        description=(
+            'Method used to determine reactivity constants '
+            '(fallback for calculation_method if not provided).'
+        ),
     )
-    logP: float | None = Field(None, description='LogP value for the reaction.')
+    logP: float | None = Field(
+        None, description='LogP value (fallback for solvent_logP if not provided).'
+    )
+    polytype_emb_1: float | None = Field(
+        None, description='Polymerization type embedding dimension 1.'
+    )
+    polytype_emb_2: float | None = Field(
+        None, description='Polymerization type embedding dimension 2.'
+    )
+    method_emb_1: float | None = Field(
+        None, description='Method embedding dimension 1.'
+    )
+    method_emb_2: float | None = Field(
+        None, description='Method embedding dimension 2.'
+    )
+    solvent_logP: float | None = Field(None, description='Solvent logP descriptor.')
+    solvent_TPSA: float | None = Field(None, description='Solvent TPSA descriptor.')
+    solvent_HBA: float | None = Field(None, description='Solvent HBA descriptor.')
+    solvent_HBD: float | None = Field(None, description='Solvent HBD descriptor.')
+    solvent_FractionCSP3: float | None = Field(
+        None, description='Solvent FractionCSP3 descriptor.'
+    )
+    solvent_MolMR: float | None = Field(None, description='Solvent MolMR descriptor.')
+    solvent_LabuteASA: float | None = Field(
+        None, description='Solvent LabuteASA descriptor.'
+    )
+    solvent_NumRotatableBonds: float | None = Field(
+        None, description='Solvent NumRotatableBonds descriptor.'
+    )
+    solvent_RingCount: float | None = Field(
+        None, description='Solvent RingCount descriptor.'
+    )
+    solvent_HeavyAtomCount: float | None = Field(
+        None, description='Solvent HeavyAtomCount descriptor.'
+    )
 
 
 class MonomerInput(BaseModel):

@@ -37,13 +37,97 @@ class ReactionConstant(ArchiveSection):
     )
 
 
+class SolventDescriptors(ArchiveSection):
+    """Molecular descriptors for the solvent."""
+
+    log_P = Quantity(
+        type=np.dtype(np.float64),
+        description=(
+            'Partition coefficient (logP), a measure of lipophilicity '
+            "representing the ratio of a compound's solubility in octanol "
+            'versus water.'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    TPSA = Quantity(
+        type=np.dtype(np.float64),
+        description=(
+            'Topological Polar Surface Area (TPSA), the sum of surface areas '
+            'of polar atoms in the molecule, used to predict drug transport '
+            'properties.'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    HBA = Quantity(
+        type=np.dtype(np.float64),
+        description=(
+            'Number of Hydrogen Bond Acceptors (HBA), atoms that can accept '
+            'hydrogen bonds (typically N, O, F).'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    HBD = Quantity(
+        type=np.dtype(np.float64),
+        description=(
+            'Number of Hydrogen Bond Donors (HBD), atoms that can donate '
+            'hydrogen bonds (typically N-H, O-H groups).'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    fraction_CSP3 = Quantity(
+        type=np.dtype(np.float64),
+        description=(
+            'Fraction of sp3 hybridized carbon atoms relative to total carbon '
+            'atoms, indicating molecular saturation.'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    mol_MR = Quantity(
+        type=np.dtype(np.float64),
+        description=(
+            'Molar Refractivity (MolMR), a measure of the volume occupied by '
+            'a molecule, calculated from the refractive index.'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    labute_ASA = Quantity(
+        type=np.dtype(np.float64),
+        description=(
+            'Labute Approximate Surface Area (ASA), an approximation of the '
+            'molecular surface area using a simplified method.'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    num_rotatable_bonds = Quantity(
+        type=np.dtype(np.float64),
+        description=(
+            'Number of rotatable bonds, single bonds that can rotate freely '
+            '(excluding terminal bonds and bonds in rings).'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    ring_count = Quantity(
+        type=np.dtype(np.float64),
+        description=(
+            'Number of rings in the molecule, counting all independent ring systems.'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    heavy_atom_count = Quantity(
+        type=np.dtype(np.float64),
+        description='Number of heavy (non-hydrogen) atoms in the molecule.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+
+
 class ReactionConditions(ArchiveSection):
     polymerization_type = Quantity(
         type=str,
         a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity),
     )
     solvent = SubSection(section_def=PubChemPureSubstanceSection)
-    method = Quantity(
+    solvent_descriptors = SubSection(section_def=SolventDescriptors)
+    polymerization_method = Quantity(
         type=str, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)
     )
     temperature = Quantity(
@@ -51,10 +135,31 @@ class ReactionConditions(ArchiveSection):
         unit='K',
         a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
-    determination_method = Quantity(
+    calculation_method = Quantity(
         type=str, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)
     )
     reaction_constants = SubSection(section_def=ReactionConstant, repeats=True)
+    # Embeddings
+    polytype_emb_1 = Quantity(
+        type=np.dtype(np.float64),
+        description='Polymerization type embedding dimension 1.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    polytype_emb_2 = Quantity(
+        type=np.dtype(np.float64),
+        description='Polymerization type embedding dimension 2.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    method_emb_1 = Quantity(
+        type=np.dtype(np.float64),
+        description='Method embedding dimension 1.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
+    method_emb_2 = Quantity(
+        type=np.dtype(np.float64),
+        description='Method embedding dimension 2.',
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
 
 
 class AtomicFeatures(ArchiveSection):
@@ -252,6 +357,14 @@ class PolymerizationReaction(Activity, Schema):
         section_def=PublicationReference,
     )
     reaction_conditions = SubSection(section_def=ReactionConditions)
+    r_product = Quantity(
+        type=np.dtype(np.float64),
+        description=(
+            'Product of reactivity ratios (r1 × r2), indicating the '
+            'copolymerization behavior and monomer reactivity.'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
+    )
 
     def get_monomer_reference(
         self, smiles: str, archive: 'EntryArchive', logger: 'BoundLogger'

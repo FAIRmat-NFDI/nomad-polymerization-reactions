@@ -10,4 +10,4 @@ data:
     temperature: 333.15
     solvent:
       name: "ClC(Cl)(Cl)Cl"
-    method: "solvent"
+    polymerization_method: "solvent"

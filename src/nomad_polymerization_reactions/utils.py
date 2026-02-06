@@ -52,9 +52,7 @@ def generate_pr_archive_from_json(  # noqa: PLR0912, PLR0915
         temperature_unit_original = file_dict.get('temperature_unit')
         if temperature_unit_original is not None:
             temperature = (
-                ureg.Quantity(temperature, temperature_unit_original)
-                .to('K')
-                .magnitude
+                ureg.Quantity(temperature, temperature_unit_original).to('K').magnitude
             )
         reaction_conditions['temperature'] = temperature
     if file_dict.get('solvent', None) is not None:
@@ -80,9 +78,15 @@ def generate_pr_archive_from_json(  # noqa: PLR0912, PLR0915
         'HeavyAtomCount': 'heavy_atom_count',
     }
     for key in (
-        'solvent_TPSA', 'solvent_HBA', 'solvent_HBD', 'solvent_FractionCSP3',
-        'solvent_MolMR', 'solvent_LabuteASA', 'solvent_NumRotatableBonds',
-        'solvent_RingCount', 'solvent_HeavyAtomCount',
+        'solvent_TPSA',
+        'solvent_HBA',
+        'solvent_HBD',
+        'solvent_FractionCSP3',
+        'solvent_MolMR',
+        'solvent_LabuteASA',
+        'solvent_NumRotatableBonds',
+        'solvent_RingCount',
+        'solvent_HeavyAtomCount',
     ):
         if file_dict.get(key) is not None:
             # Remove 'solvent_' prefix
@@ -163,8 +167,8 @@ def generate_pr_archive_from_json(  # noqa: PLR0912, PLR0915
     if same_dir_as_input:
         archive_path = filepath.replace('.json', '.archive.json')
     else:
-        archive_path = (
-            filepath.rsplit('/', maxsplit=1)[-1].replace('.json', '.archive.json')
+        archive_path = filepath.rsplit('/', maxsplit=1)[-1].replace(
+            '.json', '.archive.json'
         )
     with open(archive_path, 'w', encoding='utf-8') as f:
         json.dump(entry, f, indent=4)
@@ -304,8 +308,8 @@ def generate_monomer_archive_from_json(  # noqa: PLR0912, PLR0915
     if same_dir_as_input:
         archive_path = filepath.replace('.json', '.archive.json')
     else:
-        archive_path = (
-            filepath.rsplit('/', maxsplit=1)[-1].replace('.json', '.archive.json')
+        archive_path = filepath.rsplit('/', maxsplit=1)[-1].replace(
+            '.json', '.archive.json'
         )
 
     with open(archive_path, 'w', encoding='utf-8') as f:

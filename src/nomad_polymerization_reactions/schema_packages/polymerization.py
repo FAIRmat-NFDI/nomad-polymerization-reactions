@@ -39,11 +39,12 @@ class ReactionConstant(ArchiveSection):
 
 class SolventDescriptors(ArchiveSection):
     """Molecular descriptors for the solvent."""
+
     log_P = Quantity(
         type=np.dtype(np.float64),
         description=(
             'Partition coefficient (logP), a measure of lipophilicity '
-            'representing the ratio of a compound\'s solubility in octanol '
+            "representing the ratio of a compound's solubility in octanol "
             'versus water.'
         ),
         a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
@@ -108,8 +109,7 @@ class SolventDescriptors(ArchiveSection):
     ring_count = Quantity(
         type=np.dtype(np.float64),
         description=(
-            'Number of rings in the molecule, counting all independent ring '
-            'systems.'
+            'Number of rings in the molecule, counting all independent ring systems.'
         ),
         a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
@@ -359,7 +359,10 @@ class PolymerizationReaction(Activity, Schema):
     reaction_conditions = SubSection(section_def=ReactionConditions)
     r_product = Quantity(
         type=np.dtype(np.float64),
-        description='Product of reactivity ratios.',
+        description=(
+            'Product of reactivity ratios (r1 × r2), indicating the '
+            'copolymerization behavior and monomer reactivity.'
+        ),
         a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
 

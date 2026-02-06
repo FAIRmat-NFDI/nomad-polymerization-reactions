@@ -29,7 +29,7 @@ def test_generate_pr_archive_from_json(filepath, reference):
     assert output == reference_data
 
     # remove the generated file
-    generated_file = f'{filepath.split("/")[-1].split(".")[0]}.archive.json'
+    generated_file = filepath.split('/')[-1].replace('.json', '.archive.json')
     os.remove(generated_file)
 
 
@@ -49,5 +49,5 @@ def test_generate_monomer_archive_from_json(filepath, reference):
     assert output == reference_data
 
     # remove the generated file
-    generated_file = f'{filepath.split("/")[-1].split(".")[0]}.archive.json'
+    generated_file = filepath.split('/')[-1].replace('.json', '.archive.json')
     os.remove(generated_file)

@@ -34,11 +34,21 @@ m_package = SchemaPackage()
 
 class ReactionConstant(ArchiveSection):
     reaction_constant = Quantity(
-        type=float, a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity)
+        type=float,
+        description=(
+            'Reaction constant (e.g. reactivity ratio) for the polymerization '
+            'reaction, indicating the relative reactivity of the monomers.'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
 
     reaction_constant_confi = Quantity(
-        type=float, a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity)
+        type=float,
+        description=(
+            'Confidence interval or standard error associated with the reaction '
+            'constant, providing a measure of uncertainty in its estimation.'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
 
 
@@ -128,22 +138,33 @@ class SolventDescriptors(ArchiveSection):
 class ReactionConditions(ArchiveSection):
     polymerization_type = Quantity(
         type=str,
+        description=(
+            'Type of polymerization reaction, e.g. "free radical", "anionic", '
+            '"cationic", "ring-opening", "condensation", etc.'
+        ),
         a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity),
     )
-    solvent = SubSection(section_def=PubChemPureSubstanceSection)
-    solvent_descriptors = SubSection(section_def=SolventDescriptors)
     polymerization_method = Quantity(
-        type=str, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)
+        type=str,
+        description=(
+            'Method of polymerization reaction, e.g. "bulk", "solution", etc.'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity),
     )
     temperature = Quantity(
         type=np.dtype(np.float64),
+        description='Temperature at which the polymerization reaction was conducted.',
         unit='K',
         a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
     calculation_method = Quantity(
-        type=str, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)
+        type=str,
+        description=(
+            'Method used to calculate the reaction constants, e.g. "nonlinear least-'
+            'squares", "Mayo-Lewis method", "Fineman-Ross", etc.'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity),
     )
-    reaction_constants = SubSection(section_def=ReactionConstant, repeats=True)
     # Embeddings
     polytype_emb_1 = Quantity(
         type=np.dtype(np.float64),
@@ -165,6 +186,9 @@ class ReactionConditions(ArchiveSection):
         description='Method embedding dimension 2.',
         a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
+    reaction_constants = SubSection(section_def=ReactionConstant, repeats=True)
+    solvent = SubSection(section_def=PubChemPureSubstanceSection)
+    solvent_descriptors = SubSection(section_def=SolventDescriptors)
 
 
 class AtomicFeatures(ArchiveSection):
@@ -271,6 +295,10 @@ class XTBFeatures(ArchiveSection):
 
 
 class Monomer(PureSubstance, Schema, PlotSection):
+    """
+    Schema for monomer data in polymerization reactions.
+    """
+
     smiles = Quantity(
         type=str,
         description='SMILES representation of the monomer.',
@@ -284,7 +312,7 @@ class Monomer(PureSubstance, Schema, PlotSection):
         A field for adding additional information about the monomer that is not
         captured by the other quantities and subsections.
         """,
-        a_eln=dict(
+        a_eln=ELNAnnotation(
             component='RichTextEditQuantity',
             label='detailed monomer description',
             props=dict(height=200),
@@ -399,7 +427,6 @@ class Monomer(PureSubstance, Schema, PlotSection):
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         if not self.name:
             self.name = 'Monomer'
-        # TODO: more descriptive name?
         self.components = []
         self.elemental_composition = []
         pure_substance = None
@@ -408,9 +435,18 @@ class Monomer(PureSubstance, Schema, PlotSection):
             pure_substance.normalize(archive, logger)
         if pure_substance:
             self.pure_substance = pure_substance
+
         fig = self.generate_visualization()
         self.figures = [fig] if fig else []
+
+        # populates archive.results.material from `PureSubstance` normalization
         super().normalize(archive, logger)
+
+        if self.name != 'Monomer':
+            try:
+                archive.results.material.material_name = self.name
+            except (AttributeError, KeyError):
+                pass
 
 
 class MonomerReference(SectionReference):
@@ -457,8 +493,9 @@ class PolymerizationReaction(Activity, Schema):
     r_product = Quantity(
         type=np.dtype(np.float64),
         description=(
-            'Product of reactivity ratios (r1 × r2), indicating the '
-            'copolymerization behavior and monomer reactivity.'
+            'Product of reactivity ratios (r1 × r2), indicating the copolymerization '
+            'behavior and monomer reactivity. If two reaction constants are provided, '
+            'this field is automatically calculated as their product.'
         ),
         a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
@@ -581,11 +618,28 @@ class PolymerizationReaction(Activity, Schema):
                 monomer.reference = monomer_m_proxy
                 monomer.normalize(archive, logger)
 
+    def set_copolymerization_rproduct(self) -> None:
+        """
+        If the reaction conditions contain two reaction constants, calculate the
+        product of reactivity ratios (r_product) as their product.
+        """
+        if self.reaction_conditions and self.reaction_conditions.reaction_constants:
+            constants = [
+                rc.reaction_constant
+                for rc in self.reaction_conditions.reaction_constants
+                if rc.reaction_constant is not None
+            ]
+            num_constants_for_product = 2  # r1 and r2 for copolymerization
+            if len(constants) == num_constants_for_product:
+                self.r_product = constants[0] * constants[1]
+
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         if not self.name:
             self.name = 'Polymerization Reaction'
-            # TODO: more descriptive name?
         self.normalize_monomers(archive, logger)
+
+        self.set_copolymerization_rproduct()
+
         super().normalize(archive, logger)
 
 

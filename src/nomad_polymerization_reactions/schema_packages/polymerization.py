@@ -469,8 +469,9 @@ class PolymerizationReaction(Activity, Schema):
     r_product = Quantity(
         type=np.dtype(np.float64),
         description=(
-            'Product of reactivity ratios (r1 × r2), indicating the '
-            'copolymerization behavior and monomer reactivity.'
+            'Product of reactivity ratios (r1 × r2), indicating the copolymerization '
+            'behavior and monomer reactivity. If two reaction constants are provided, '
+            'this field is automatically calculated as their product.'
         ),
         a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
@@ -593,10 +594,28 @@ class PolymerizationReaction(Activity, Schema):
                 monomer.reference = monomer_m_proxy
                 monomer.normalize(archive, logger)
 
+    def set_copolymerization_rproduct(self) -> None:
+        """
+        If the reaction conditions contain two reaction constants, calculate the
+        product of reactivity ratios (r_product) as their product.
+        """
+        if self.reaction_conditions and self.reaction_conditions.reaction_constants:
+            constants = [
+                rc.reaction_constant
+                for rc in self.reaction_conditions.reaction_constants
+                if rc.reaction_constant is not None
+            ]
+            num_constants_for_product = 2  # r1 and r2 for copolymerization
+            if len(constants) == num_constants_for_product:
+                self.r_product = constants[0] * constants[1]
+
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         if not self.name:
             self.name = 'Polymerization Reaction'
         self.normalize_monomers(archive, logger)
+
+        self.set_copolymerization_rproduct()
+
         super().normalize(archive, logger)
 
 

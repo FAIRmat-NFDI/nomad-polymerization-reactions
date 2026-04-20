@@ -325,8 +325,9 @@ class Monomer(PureSubstance, Schema, PlotSection):
         # Colors from ASE's Jmol palette, sizes from covalent radii
         # Override white (H) to light grey for visibility
         def atom_color(atomic_number: int) -> str:
+            grey_cutoff = 0.95
             r, g, b = jmol_colors[atomic_number]
-            if r > 0.95 and g > 0.95 and b > 0.95:
+            if r > grey_cutoff and g > grey_cutoff and b > grey_cutoff:
                 return 'rgb(200, 200, 200)'
             return f'rgb({int(r * 255)}, {int(g * 255)}, {int(b * 255)})'
 

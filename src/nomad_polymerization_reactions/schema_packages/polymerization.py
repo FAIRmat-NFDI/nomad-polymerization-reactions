@@ -271,6 +271,10 @@ class XTBFeatures(ArchiveSection):
 
 
 class Monomer(PureSubstance, Schema, PlotSection):
+    """
+    Schema for monomer data in polymerization reactions.
+    """
+
     smiles = Quantity(
         type=str,
         description='SMILES representation of the monomer.',
@@ -284,7 +288,7 @@ class Monomer(PureSubstance, Schema, PlotSection):
         A field for adding additional information about the monomer that is not
         captured by the other quantities and subsections.
         """,
-        a_eln=dict(
+        a_eln=ELNAnnotation(
             component='RichTextEditQuantity',
             label='detailed monomer description',
             props=dict(height=200),
@@ -399,7 +403,6 @@ class Monomer(PureSubstance, Schema, PlotSection):
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         if not self.name:
             self.name = 'Monomer'
-        # TODO: more descriptive name?
         self.components = []
         self.elemental_composition = []
         pure_substance = None
@@ -408,9 +411,18 @@ class Monomer(PureSubstance, Schema, PlotSection):
             pure_substance.normalize(archive, logger)
         if pure_substance:
             self.pure_substance = pure_substance
+
         fig = self.generate_visualization()
         self.figures = [fig] if fig else []
+
+        # populates archive.results.material from `PureSubstance` normalization
         super().normalize(archive, logger)
+
+        if self.name != 'Monomer':
+            try:
+                archive.results.material.material_name = self.name
+            except (AttributeError, KeyError):
+                pass
 
 
 class MonomerReference(SectionReference):
@@ -584,7 +596,6 @@ class PolymerizationReaction(Activity, Schema):
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         if not self.name:
             self.name = 'Polymerization Reaction'
-            # TODO: more descriptive name?
         self.normalize_monomers(archive, logger)
         super().normalize(archive, logger)
 

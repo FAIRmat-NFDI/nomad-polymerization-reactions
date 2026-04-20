@@ -3,7 +3,11 @@ from typing import (
 )
 
 import numpy as np
-from ase.data import chemical_symbols
+import plotly.graph_objects as go
+from ase import Atoms
+from ase.data import chemical_symbols, covalent_radii
+from ase.data.colors import jmol_colors
+from ase.neighborlist import NeighborList, natural_cutoffs
 from nomad.datamodel.data import ArchiveSection, Schema
 from nomad.datamodel.metainfo.annotations import ELNAnnotation, ELNComponentEnum
 from nomad.datamodel.metainfo.basesections import (
@@ -13,6 +17,7 @@ from nomad.datamodel.metainfo.basesections import (
     PublicationReference,
 )
 from nomad.datamodel.metainfo.basesections.v1 import PureSubstance, SectionReference
+from nomad.datamodel.metainfo.plot import PlotlyFigure, PlotSection
 from nomad.metainfo import MEnum, Quantity, SchemaPackage, SubSection
 from nomad.metainfo.metainfo import Section
 
@@ -265,7 +270,7 @@ class XTBFeatures(ArchiveSection):
     )
 
 
-class Monomer(PureSubstance, Schema):
+class Monomer(PureSubstance, Schema, PlotSection):
     smiles = Quantity(
         type=str,
         description='SMILES representation of the monomer.',
@@ -290,15 +295,105 @@ class Monomer(PureSubstance, Schema):
         section_def=XTBFeatures,
     )
 
-    def generate_visualization(
-        self, archive: 'EntryArchive', logger: 'BoundLogger'
-    ) -> None:
+    def generate_visualization(self) -> PlotlyFigure | None:
         """
-        Generate visualization for the monomer based on its calculated atomic features
-        of the best conformer.
+        Generate a 3D visualization of the monomer from its atomic positions.
+
+        Uses ASE for atom data and bond detection (via natural cutoff neighbor
+        list). Renders a Plotly 3D scatter with Jmol colors and sizes based on covalent
+        radii.
         """
-        # TODO: implement visualization generation
-        pass
+
+        if not self.xtb_features or not self.xtb_features.atomic_features:
+            return None
+
+        elements = []
+        positions = []
+        for atom in self.xtb_features.atomic_features:
+            if atom.element is None or atom.positions is None:
+                continue
+            elements.append(atom.element)
+            positions.append(atom.positions.to('angstrom').magnitude)
+
+        if not positions:
+            return None
+
+        atoms = Atoms(symbols=elements, positions=positions)
+        pos = atoms.get_positions()
+        x, y, z = pos[:, 0], pos[:, 1], pos[:, 2]
+
+        # Colors from ASE's Jmol palette, sizes from covalent radii
+        # Override white (H) to light grey for visibility
+        def atom_color(atomic_number: int) -> str:
+            r, g, b = jmol_colors[atomic_number]
+            if r > 0.95 and g > 0.95 and b > 0.95:
+                return 'rgb(200, 200, 200)'
+            return f'rgb({int(r * 255)}, {int(g * 255)}, {int(b * 255)})'
+
+        colors = [atom_color(a.number) for a in atoms]
+        sizes = [max(6, covalent_radii[a.number] * 18) for a in atoms]
+
+        # Atom trace
+        atom_trace = go.Scatter3d(
+            x=x,
+            y=y,
+            z=z,
+            mode='markers+text',
+            marker=dict(
+                size=sizes,
+                color=colors,
+                line=dict(width=1, color='#333333'),
+            ),
+            text=elements,
+            textposition='top center',
+            textfont=dict(size=9),
+            hovertext=[
+                f'{s} ({xi:.3f}, {yi:.3f}, {zi:.3f})'
+                for s, xi, yi, zi in zip(elements, x, y, z)
+            ],
+            hoverinfo='text',
+            name='atoms',
+        )
+
+        # Bond detection using ASE neighbor list
+        cutoffs = natural_cutoffs(atoms)
+        nl = NeighborList(cutoffs, self_interaction=False, bothways=False)
+        nl.update(atoms)
+
+        bond_x, bond_y, bond_z = [], [], []
+        for i in range(len(atoms)):
+            indices, _ = nl.get_neighbors(i)
+            for j in indices:
+                bond_x.extend([x[i], x[j], None])
+                bond_y.extend([y[i], y[j], None])
+                bond_z.extend([z[i], z[j], None])
+
+        bond_trace = go.Scatter3d(
+            x=bond_x,
+            y=bond_y,
+            z=bond_z,
+            mode='lines',
+            line=dict(color='#555555', width=4),
+            hoverinfo='none',
+            name='bonds',
+        )
+
+        fig = go.Figure(data=[bond_trace, atom_trace])
+        fig.update_layout(
+            scene=dict(
+                xaxis_title='x (Å)',
+                yaxis_title='y (Å)',
+                zaxis_title='z (Å)',
+                aspectmode='data',
+            ),
+            showlegend=False,
+            margin=dict(l=0, r=0, t=40, b=0),
+        )
+
+        return PlotlyFigure(
+            label='Best conformer visualization generated from xTB features.',
+            figure=fig.to_plotly_json(),
+        )
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         if not self.name:
@@ -312,7 +407,8 @@ class Monomer(PureSubstance, Schema):
             pure_substance.normalize(archive, logger)
         if pure_substance:
             self.pure_substance = pure_substance
-        self.generate_visualization(archive, logger)
+        fig = self.generate_visualization()
+        self.figures = [fig] if fig else []
         super().normalize(archive, logger)
 
 

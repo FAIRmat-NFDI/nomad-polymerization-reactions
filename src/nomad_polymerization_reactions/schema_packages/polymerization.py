@@ -34,11 +34,21 @@ m_package = SchemaPackage()
 
 class ReactionConstant(ArchiveSection):
     reaction_constant = Quantity(
-        type=float, a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity)
+        type=float,
+        description=(
+            'Reaction constant (e.g. reactivity ratio) for the polymerization '
+            'reaction, indicating the relative reactivity of the monomers.'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
 
     reaction_constant_confi = Quantity(
-        type=float, a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity)
+        type=float,
+        description=(
+            'Confidence interval or standard error associated with the reaction '
+            'constant, providing a measure of uncertainty in its estimation.'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
 
 
@@ -128,22 +138,33 @@ class SolventDescriptors(ArchiveSection):
 class ReactionConditions(ArchiveSection):
     polymerization_type = Quantity(
         type=str,
+        description=(
+            'Type of polymerization reaction, e.g. "free radical", "anionic", '
+            '"cationic", "ring-opening", "condensation", etc.'
+        ),
         a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity),
     )
-    solvent = SubSection(section_def=PubChemPureSubstanceSection)
-    solvent_descriptors = SubSection(section_def=SolventDescriptors)
     polymerization_method = Quantity(
-        type=str, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)
+        type=str,
+        description=(
+            'Method of polymerization reaction, e.g. "bulk", "solution", etc.'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity),
     )
     temperature = Quantity(
         type=np.dtype(np.float64),
+        description='Temperature at which the polymerization reaction was conducted.',
         unit='K',
         a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
     calculation_method = Quantity(
-        type=str, a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity)
+        type=str,
+        description=(
+            'Method used to calculate the reaction constants, e.g. "nonlinear least-'
+            'squares", "Mayo-Lewis method", "Fineman-Ross", etc.'
+        ),
+        a_eln=ELNAnnotation(component=ELNComponentEnum.StringEditQuantity),
     )
-    reaction_constants = SubSection(section_def=ReactionConstant, repeats=True)
     # Embeddings
     polytype_emb_1 = Quantity(
         type=np.dtype(np.float64),
@@ -165,6 +186,9 @@ class ReactionConditions(ArchiveSection):
         description='Method embedding dimension 2.',
         a_eln=ELNAnnotation(component=ELNComponentEnum.NumberEditQuantity),
     )
+    reaction_constants = SubSection(section_def=ReactionConstant, repeats=True)
+    solvent = SubSection(section_def=PubChemPureSubstanceSection)
+    solvent_descriptors = SubSection(section_def=SolventDescriptors)
 
 
 class AtomicFeatures(ArchiveSection):

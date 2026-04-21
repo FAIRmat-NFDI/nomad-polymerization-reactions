@@ -440,11 +440,11 @@ class Monomer(PureSubstance, Schema, PlotSection):
 
         # reset `archive.results.material` section to be repopulated from
         # `PureSubstance` normalization
-        if archive.results.material:
+        if archive.results and archive.results.material:
             archive.results.material = None
-            archive.m_setdefault('results.material')
-            if self.name != 'Monomer':
-                archive.results.material.material_name = self.name
+        archive.m_setdefault('results.material')
+        if self.name != 'Monomer':
+            archive.results.material.material_name = self.name
 
         self.components = []
         self.elemental_composition = []

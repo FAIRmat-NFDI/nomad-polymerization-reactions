@@ -425,8 +425,27 @@ class Monomer(PureSubstance, Schema, PlotSection):
         )
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
+        """
+        Populates the `pure_substance` section with data from PubChem based on the
+        `smiles` quantity.
+
+        Resets the `archive.results.material` section with the monomer name, if
+        provided.
+
+        Generates a 3D visualization of the monomer if atomic positions are available
+        from the xTB features.
+        """
         if not self.name:
             self.name = 'Monomer'
+
+        # reset `archive.results.material` section to be repopulated from
+        # `PureSubstance` normalization
+        if archive.results.material:
+            archive.results.material = None
+            archive.m_setdefault('results.material')
+            if self.name != 'Monomer':
+                archive.results.material.material_name = self.name
+
         self.components = []
         self.elemental_composition = []
         pure_substance = None
@@ -439,14 +458,7 @@ class Monomer(PureSubstance, Schema, PlotSection):
         fig = self.generate_visualization()
         self.figures = [fig] if fig else []
 
-        # populates archive.results.material from `PureSubstance` normalization
         super().normalize(archive, logger)
-
-        if self.name != 'Monomer':
-            try:
-                archive.results.material.material_name = self.name
-            except (AttributeError, KeyError):
-                pass
 
 
 class MonomerReference(SectionReference):

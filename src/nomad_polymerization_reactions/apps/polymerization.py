@@ -9,6 +9,7 @@ from nomad.config.models.ui import (
     MenuItemHistogram,
     MenuItemTerms,
     MenuSizeEnum,
+    ModeEnum,
 )
 
 PR_SCHEMA_PATH = (
@@ -58,12 +59,10 @@ polymerization_app = App(
             search_quantity=(f'data.reaction_conditions.temperature#{PR_SCHEMA_PATH}'),
             label='Temperature',
             selected=True,
-            options={
-                'format': Format(
-                    decimals=2,
-                    mode='standard',
-                )
-            },
+            format=Format(
+                decimals=2,
+                mode=ModeEnum.STANDARD,
+            ),
         ),
         Column(
             search_quantity=(f'data.publication_reference.DOI_number#{PR_SCHEMA_PATH}'),
@@ -133,16 +132,6 @@ polymerization_app = App(
                 title='Reaction Constants',
                 size=MenuSizeEnum.XXL,
                 items=[
-                    MenuItemTerms(
-                        title='Calculation Method',
-                        search_quantity=(
-                            'data.reaction_conditions.calculation_method#'
-                            f'{PR_SCHEMA_PATH}'
-                        ),
-                        width=4,
-                        options=10,
-                        show_input=True,
-                    ),
                     MenuItemHistogram(
                         title='Reaction Constant',
                         x=Axis(
@@ -152,7 +141,15 @@ polymerization_app = App(
                             ),
                             scale='linear',
                         ),
-                        width=8,
+                    ),
+                    MenuItemTerms(
+                        title='Calculation Method',
+                        search_quantity=(
+                            'data.reaction_conditions.calculation_method#'
+                            f'{PR_SCHEMA_PATH}'
+                        ),
+                        options=10,
+                        show_input=True,
                     ),
                 ],
             ),

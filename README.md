@@ -16,7 +16,7 @@ You can also use a dedicated search app to look up polymerization-specific entri
 
 Install the package in your local environment with pip:
 ```bash
-pip install git+https://github.com/FAIRmat-NFDI/nomad-polymerization-reactions.git
+pip install nomad-polymerization-reactions
 ```
 
 ## Adding this plugin to NOMAD Oasis

@@ -1,15 +1,21 @@
-import yaml
 from nomad.config.models.ui import (
     App,
     Axis,
+    AxisQuantity,
+    BreakpointEnum,
     Column,
+    Dashboard,
     Filters,
     Format,
+    Layout,
+    Markers,
     Menu,
     MenuItemHistogram,
     MenuItemTerms,
     MenuSizeEnum,
     ModeEnum,
+    WidgetScatterPlot,
+    WidgetTerms,
 )
 
 PR_SCHEMA_PATH = (
@@ -189,145 +195,81 @@ polymerization_app = App(
             ),
         ],
     ),
-    dashboard={
-        'widgets': yaml.safe_load(f"""
-- type: scatter_plot
-  autorange: true
-  sample_size: 10000
-  y:
-    search_quantity: data.r_product#{PR_SCHEMA_PATH}
-    title: r-product
-  x:
-    search_quantity: data.reaction_conditions.temperature#{PR_SCHEMA_PATH}
-    title: Reaction Temperature
-  title: r-product vs Reaction Temperature
-  layout:
-    xxl:
-      minH: 3
-      minW: 3
-      h: 7
-      w: 10
-      y: 0
-      x: 0
-    xl:
-      minH: 3
-      minW: 3
-      h: 9
-      w: 12
-      y: 0
-      x: 11
-    lg:
-      minH: 3
-      minW: 3
-      h: 6
-      w: 9
-      y: 0
-      x: 9
-    md:
-      minH: 3
-      minW: 3
-      h: 6
-      w: 9
-      y: 0
-      x: 0
-    sm:
-      minH: 3
-      minW: 3
-      h: 6
-      w: 9
-      y: 0
-      x: 0
-- type: terms
-  scale: linear
-  search_quantity: data.monomers.name#{PR_SCHEMA_PATH}
-  title: Monomer
-  layout:
-    xxl:
-      minH: 3
-      minW: 3
-      h: 7
-      w: 7
-      y: 0
-      x: 19
-    xl:
-      minH: 3
-      minW: 3
-      h: 9
-      w: 6
-      y: 0
-      x: 23
-    lg:
-      minH: 3
-      minW: 3
-      h: 9
-      w: 6
-      y: 0
-      x: 18
-    md:
-      minH: 3
-      minW: 3
-      h: 9
-      w: 6
-      y: 0
-      x: 0
-    sm:
-      minH: 3
-      minW: 3
-      h: 9
-      w: 6
-      y: 0
-      x: 0
-- type: scatter_plot
-  autorange: true
-  sample_size: 10000
-  markers:
-    color:
-      search_quantity: data.reaction_conditions.calculation_method#{PR_SCHEMA_PATH}
-      title: Calculation Method
-  y:
-    search_quantity: data.reaction_conditions.reaction_constants[0].reaction_constant#{PR_SCHEMA_PATH}
-    title: r1
-  x:
-    search_quantity: data.reaction_conditions.reaction_constants[1].reaction_constant#{PR_SCHEMA_PATH}
-    title: r2
-  title: "r1 vs r2 colored by Calculation Method"
-  layout:
-    xxl:
-      minH: 3
-      minW: 3
-      h: 7
-      w: 9
-      y: 0
-      x: 10
-    xl:
-      minH: 3
-      minW: 3
-      h: 9
-      w: 11
-      y: 0
-      x: 0
-    lg:
-      minH: 3
-      minW: 3
-      h: 6
-      w: 9
-      y: 0
-      x: 0
-    md:
-      minH: 3
-      minW: 3
-      h: 6
-      w: 9
-      y: 0
-      x: 0
-    sm:
-      minH: 3
-      minW: 3
-      h: 6
-      w: 9
-      y: 0
-      x: 0
-
-""")  # noqa: E501
-    },
+    dashboard=Dashboard(
+        # SM: 6x12 grid
+        # MD: 9x18 grid
+        # LG: 12x24 grid
+        # XL: 15x30 grid
+        # XXL: 18x36 grid
+        widgets=[
+            WidgetScatterPlot(
+                title='r1 vs r2 colored by Calculation Method',
+                autorange=True,
+                sample_size=10000,
+                y=AxisQuantity(
+                    search_quantity=(
+                        'data.reaction_conditions.reaction_constants[0].'
+                        f'reaction_constant#{PR_SCHEMA_PATH}'
+                    ),
+                    title='r1',
+                ),
+                x=AxisQuantity(
+                    search_quantity=(
+                        'data.reaction_conditions.reaction_constants[1].'
+                        f'reaction_constant#{PR_SCHEMA_PATH}'
+                    ),
+                    title='r2',
+                ),
+                markers=Markers(
+                    color=AxisQuantity(
+                        search_quantity=(
+                            'data.reaction_conditions.calculation_method'
+                            f'#{PR_SCHEMA_PATH}'
+                        ),
+                        title='Calculation Method',
+                    ),
+                ),
+                layout={
+                    BreakpointEnum.XXL: Layout(h=9, w=16, y=0, x=0),
+                    BreakpointEnum.XL: Layout(h=8, w=13, y=0, x=0),
+                    BreakpointEnum.LG: Layout(h=12, w=16, y=0, x=0),
+                    BreakpointEnum.MD: Layout(h=8, w=18, y=0, x=0),
+                    BreakpointEnum.SM: Layout(h=6, w=12, y=0, x=0),
+                },
+            ),
+            WidgetScatterPlot(
+                title='r-product vs Reaction Temperature',
+                autorange=True,
+                sample_size=10000,
+                y=AxisQuantity(
+                    search_quantity=(f'data.r_product#{PR_SCHEMA_PATH}'),
+                    title='r-product',
+                ),
+                x=AxisQuantity(
+                    search_quantity=(
+                        f'data.reaction_conditions.temperature#{PR_SCHEMA_PATH}'
+                    ),
+                    title='Reaction Temperature',
+                ),
+                layout={
+                    BreakpointEnum.XXL: Layout(h=9, w=12, y=0, x=16),
+                    BreakpointEnum.XL: Layout(h=8, w=10, y=0, x=13),
+                    BreakpointEnum.LG: Layout(h=6, w=8, y=0, x=16),
+                    BreakpointEnum.MD: Layout(h=8, w=10, y=8, x=0),
+                    BreakpointEnum.SM: Layout(h=6, w=12, y=6, x=0),
+                },
+            ),
+            WidgetTerms(
+                title='Monomer',
+                search_quantity=(f'data.monomers.name#{PR_SCHEMA_PATH}'),
+                layout={
+                    BreakpointEnum.XXL: Layout(h=9, w=8, y=0, x=28),
+                    BreakpointEnum.XL: Layout(h=8, w=7, y=0, x=23),
+                    BreakpointEnum.LG: Layout(h=6, w=8, y=6, x=16),
+                    BreakpointEnum.MD: Layout(h=8, w=8, y=8, x=10),
+                    BreakpointEnum.SM: Layout(h=6, w=12, y=12, x=0),
+                },
+            ),
+        ]
+    ),
 )

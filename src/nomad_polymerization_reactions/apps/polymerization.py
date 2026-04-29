@@ -2,19 +2,20 @@ from nomad.config.models.ui import (
     App,
     Axis,
     AxisQuantity,
+    AxisScale,
     BreakpointEnum,
     Column,
     Dashboard,
     Filters,
     Format,
     Layout,
-    Markers,
     Menu,
     MenuItemHistogram,
     MenuItemTerms,
     MenuSizeEnum,
     ModeEnum,
-    WidgetScatterPlot,
+    ScaleEnum,
+    WidgetHistogram,
     WidgetTerms,
 )
 
@@ -202,60 +203,34 @@ polymerization_app = App(
         # XL: 15x30 grid
         # XXL: 18x36 grid
         widgets=[
-            WidgetScatterPlot(
-                title='r1 vs r2 colored by Calculation Method',
+            WidgetHistogram(
+                title='Reaction Temperature Distribution',
                 autorange=True,
                 sample_size=10000,
-                y=AxisQuantity(
-                    search_quantity=(
-                        'data.reaction_conditions.reaction_constants[0].'
-                        f'reaction_constant#{PR_SCHEMA_PATH}'
-                    ),
-                    title='r1',
-                ),
-                x=AxisQuantity(
-                    search_quantity=(
-                        'data.reaction_conditions.reaction_constants[1].'
-                        f'reaction_constant#{PR_SCHEMA_PATH}'
-                    ),
-                    title='r2',
-                ),
-                markers=Markers(
-                    color=AxisQuantity(
-                        search_quantity=(
-                            'data.reaction_conditions.calculation_method'
-                            f'#{PR_SCHEMA_PATH}'
-                        ),
-                        title='Calculation Method',
-                    ),
-                ),
-                layout={
-                    BreakpointEnum.XXL: Layout(h=9, w=16, y=0, x=0),
-                    BreakpointEnum.XL: Layout(h=8, w=13, y=0, x=0),
-                    BreakpointEnum.LG: Layout(h=12, w=16, y=0, x=0),
-                    BreakpointEnum.MD: Layout(h=8, w=18, y=0, x=0),
-                    BreakpointEnum.SM: Layout(h=6, w=12, y=0, x=0),
-                },
-            ),
-            WidgetScatterPlot(
-                title='r-product vs Reaction Temperature',
-                autorange=True,
-                sample_size=10000,
-                y=AxisQuantity(
-                    search_quantity=(f'data.r_product#{PR_SCHEMA_PATH}'),
-                    title='r-product',
-                ),
                 x=AxisQuantity(
                     search_quantity=(
                         f'data.reaction_conditions.temperature#{PR_SCHEMA_PATH}'
                     ),
-                    title='Reaction Temperature',
+                ),
+                y=AxisScale(scale=ScaleEnum.LOG),
+                layout={
+                    BreakpointEnum.XXL: Layout(h=9, w=18, y=0, x=0),
+                    BreakpointEnum.XL: Layout(h=8, w=15, y=0, x=0),
+                    BreakpointEnum.LG: Layout(h=6, w=12, y=0, x=0),
+                    BreakpointEnum.MD: Layout(h=8, w=18, y=0, x=0),
+                    BreakpointEnum.SM: Layout(h=6, w=12, y=0, x=0),
+                },
+            ),
+            WidgetTerms(
+                title='Polymerization Method',
+                search_quantity=(
+                    f'data.reaction_conditions.polymerization_method#{PR_SCHEMA_PATH}'
                 ),
                 layout={
-                    BreakpointEnum.XXL: Layout(h=9, w=12, y=0, x=16),
-                    BreakpointEnum.XL: Layout(h=8, w=10, y=0, x=13),
-                    BreakpointEnum.LG: Layout(h=6, w=8, y=0, x=16),
-                    BreakpointEnum.MD: Layout(h=8, w=10, y=8, x=0),
+                    BreakpointEnum.XXL: Layout(h=9, w=9, y=0, x=18),
+                    BreakpointEnum.XL: Layout(h=8, w=8, y=0, x=15),
+                    BreakpointEnum.LG: Layout(h=6, w=6, y=0, x=12),
+                    BreakpointEnum.MD: Layout(h=8, w=9, y=8, x=0),
                     BreakpointEnum.SM: Layout(h=6, w=12, y=6, x=0),
                 },
             ),
@@ -263,10 +238,10 @@ polymerization_app = App(
                 title='Monomer',
                 search_quantity=(f'data.monomers.name#{PR_SCHEMA_PATH}'),
                 layout={
-                    BreakpointEnum.XXL: Layout(h=9, w=8, y=0, x=28),
+                    BreakpointEnum.XXL: Layout(h=9, w=9, y=0, x=27),
                     BreakpointEnum.XL: Layout(h=8, w=7, y=0, x=23),
-                    BreakpointEnum.LG: Layout(h=6, w=8, y=6, x=16),
-                    BreakpointEnum.MD: Layout(h=8, w=8, y=8, x=10),
+                    BreakpointEnum.LG: Layout(h=6, w=6, y=0, x=18),
+                    BreakpointEnum.MD: Layout(h=8, w=9, y=8, x=9),
                     BreakpointEnum.SM: Layout(h=6, w=12, y=12, x=0),
                 },
             ),

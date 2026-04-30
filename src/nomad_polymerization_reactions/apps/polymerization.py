@@ -206,7 +206,6 @@ polymerization_app = App(
             WidgetHistogram(
                 title='Reaction Temperature Distribution',
                 autorange=True,
-                sample_size=10000,
                 x=AxisQuantity(
                     search_quantity=(
                         f'data.reaction_conditions.temperature#{PR_SCHEMA_PATH}'

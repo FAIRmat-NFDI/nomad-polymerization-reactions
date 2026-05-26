@@ -90,7 +90,7 @@ polymerization_app = App(
                             search_quantity=(
                                 f'data.reaction_conditions.temperature#{PR_SCHEMA_PATH}'
                             ),
-                            scale='linear',
+                            scale=ScaleEnum.LOG,
                             unit='K',
                         ),
                     ),
@@ -101,7 +101,7 @@ polymerization_app = App(
                                 'data.reaction_conditions.solvent_descriptors.log_P#'
                                 f'{PR_SCHEMA_PATH}'
                             ),
-                            scale='linear',
+                            scale=ScaleEnum.LOG,
                         ),
                     ),
                     MenuItemTerms(
@@ -146,7 +146,7 @@ polymerization_app = App(
                                 'data.reaction_conditions.reaction_constants.'
                                 f'reaction_constant#{PR_SCHEMA_PATH}'
                             ),
-                            scale='linear',
+                            scale=ScaleEnum.LOG,
                         ),
                     ),
                     MenuItemTerms(
@@ -171,7 +171,7 @@ polymerization_app = App(
                                 'data.publication_reference.publication_date'
                                 f'#{PR_SCHEMA_PATH}'
                             ),
-                            scale='linear',
+                            scale=ScaleEnum.LOG,
                         ),
                     ),
                     MenuItemTerms(

@@ -18,9 +18,11 @@ from nomad.datamodel.metainfo.basesections import (
     PublicationReference,
 )
 from nomad.datamodel.metainfo.basesections.v1 import PureSubstance, SectionReference
-from nomad.datamodel.metainfo.plot import PlotlyFigure, PlotSection
+from nomad.datamodel.results import Material, System
 from nomad.metainfo import MEnum, Quantity, SchemaPackage, SubSection
 from nomad.metainfo.metainfo import Section
+from nomad.normalizing.common import nomad_atoms_from_ase_atoms
+from nomad.normalizing.topology import add_system, add_system_info
 
 if TYPE_CHECKING:
     from nomad.datamodel.datamodel import (
@@ -425,6 +427,46 @@ class Monomer(PureSubstance, Schema, PlotSection):
             figure=fig.to_plotly_json(),
         )
 
+    def populate_topology(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
+        """
+        Populates the `topology` section with elements and atomic positions from the
+        xTB features.
+        """
+        if not self.xtb_features or not self.xtb_features.atomic_features:
+            return
+
+        elements = []
+        positions = []
+        for atom in self.xtb_features.atomic_features:
+            if atom.element is None or atom.positions is None:
+                continue
+            elements.append(atom.element)
+            positions.append(atom.positions.to('angstrom').magnitude)
+
+        if not positions:
+            return None
+
+        atoms = Atoms(symbols=elements, positions=positions)
+
+        material = Material()
+        material.elements = list(elements)
+        topology = {}
+        system = System(
+            atoms=nomad_atoms_from_ase_atoms(atoms),
+            label=atoms.get_chemical_formula(),
+            description='Structure based on xTB features of the best conformer of the '
+            'molecule.',
+            structural_type='monomer',
+            dimensionality='3D',
+        )
+        add_system_info(system, topology)
+        add_system(system, topology)
+
+        material.topology = list(topology.values())
+
+        archive.m_setdefault('results.material')
+        archive.results.material = material
+
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         """
         Populates the `pure_substance` section with data from PubChem based on the
@@ -461,6 +503,8 @@ class Monomer(PureSubstance, Schema, PlotSection):
             pure_substance.smile = self.smiles
         if pure_substance:
             self.pure_substance = pure_substance
+
+        self.populate_topology(archive, logger)
 
         fig = self.generate_visualization()
         self.figures = [fig] if fig else []

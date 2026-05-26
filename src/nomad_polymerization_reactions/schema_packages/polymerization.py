@@ -15,7 +15,7 @@ from nomad.datamodel.metainfo.basesections import (
     PublicationReference,
 )
 from nomad.datamodel.metainfo.basesections.v1 import PureSubstance, SectionReference
-from nomad.datamodel.results import Material, System
+from nomad.datamodel.results import System
 from nomad.metainfo import MEnum, Quantity, SchemaPackage, SubSection
 from nomad.metainfo.metainfo import Section
 from nomad.normalizing.common import nomad_atoms_from_ase_atoms
@@ -344,8 +344,6 @@ class Monomer(PureSubstance, Schema):
 
         atoms = Atoms(symbols=elements, positions=positions)
 
-        material = Material()
-        material.elements = list(elements)
         topology = {}
         system = System(
             atoms=nomad_atoms_from_ase_atoms(atoms),
@@ -358,10 +356,8 @@ class Monomer(PureSubstance, Schema):
         add_system_info(system, topology)
         add_system(system, topology)
 
-        material.topology = list(topology.values())
-
-        archive.m_setdefault('results.material')
-        archive.results.material = material
+        archive.results.material.elements = list(elements)
+        archive.results.material.topology = list(topology.values())
 
     def normalize(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         """

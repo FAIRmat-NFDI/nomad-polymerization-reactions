@@ -402,9 +402,6 @@ class Monomer(PureSubstance, Schema):
 
         self.populate_topology(archive, logger)
 
-        fig = self.generate_visualization()
-        self.figures = [fig] if fig else []
-
         super().normalize(archive, logger)
 
 

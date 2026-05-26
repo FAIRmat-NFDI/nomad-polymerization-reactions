@@ -325,8 +325,8 @@ class Monomer(PureSubstance, Schema):
 
     def populate_topology(self, archive: 'EntryArchive', logger: 'BoundLogger') -> None:
         """
-        Populates the `topology` section with elements and atomic positions from the
-        xTB features.
+        Populates the `archive.results.material` section with elements and topology
+        using the atomic positions from xTB features.
         """
         if not self.xtb_features or not self.xtb_features.atomic_features:
             return

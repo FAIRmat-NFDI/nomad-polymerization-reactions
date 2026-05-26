@@ -72,8 +72,8 @@ polymerization_app = App(
             ),
         ),
         Column(
-            search_quantity=(f'data.publication_reference.DOI_number#{PR_SCHEMA_PATH}'),
-            label='Publication DOI',
+            search_quantity=('references'),
+            label='References',
             selected=True,
         ),
     ],

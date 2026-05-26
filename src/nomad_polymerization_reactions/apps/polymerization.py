@@ -72,8 +72,8 @@ polymerization_app = App(
             ),
         ),
         Column(
-            search_quantity=(f'data.publication_reference.DOI_number#{PR_SCHEMA_PATH}'),
-            label='Publication DOI',
+            search_quantity=('references'),
+            label='References',
             selected=True,
         ),
     ],
@@ -114,7 +114,7 @@ polymerization_app = App(
                         show_input=True,
                     ),
                     MenuItemTerms(
-                        title='Method',
+                        title='Polymerization Method',
                         search_quantity=(
                             'data.reaction_conditions.polymerization_method#'
                             f'{PR_SCHEMA_PATH}'

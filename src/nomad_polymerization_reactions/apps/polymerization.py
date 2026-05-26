@@ -114,7 +114,7 @@ polymerization_app = App(
                         show_input=True,
                     ),
                     MenuItemTerms(
-                        title='Method',
+                        title='Polymerization Method',
                         search_quantity=(
                             'data.reaction_conditions.polymerization_method#'
                             f'{PR_SCHEMA_PATH}'

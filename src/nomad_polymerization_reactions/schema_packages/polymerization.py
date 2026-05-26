@@ -1,6 +1,7 @@
 from typing import (
     TYPE_CHECKING,
 )
+from urllib.parse import quote
 
 import numpy as np
 import plotly.graph_objects as go
@@ -450,8 +451,14 @@ class Monomer(PureSubstance, Schema, PlotSection):
         self.elemental_composition = []
         pure_substance = None
         if self.smiles:
-            pure_substance = PubChemPureSubstanceSection(smile=self.smiles)
+            # Use URL-encoded SMILES to handle special characters properly when
+            # fetching from PubChem. Can be removed once `PubChemPureSubstanceSection`
+            # implements URL encoding.
+            pure_substance = PubChemPureSubstanceSection(
+                smile=quote(self.smiles, safe='')
+            )
             pure_substance.normalize(archive, logger)
+            pure_substance.smile = self.smiles
         if pure_substance:
             self.pure_substance = pure_substance
 

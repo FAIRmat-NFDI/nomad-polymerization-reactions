@@ -152,9 +152,13 @@ def generate_pr_archive_from_json(  # noqa: PLR0912, PLR0915
         'nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction'
     )
     if file_dict.get('source', None) is not None:
-        data_dict_ordered['publication_reference'] = dict(
-            DOI_number=file_dict['source']
-        )
+        source = file_dict['source']
+        # Check if source is a valid DOI (starts with '10.' or contains 'doi.org')
+        if source.startswith('10.') or 'doi.org' in source.lower():
+            data_dict_ordered['publication_reference'] = dict(DOI_number=source)
+        else:
+            data_dict_ordered['publication_reference'] = dict(journal=source)
+
     if file_dict.get('r-product', None) is not None:
         data_dict_ordered['r_product'] = file_dict['r-product']
     if monomers:

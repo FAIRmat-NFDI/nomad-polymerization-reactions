@@ -364,26 +364,18 @@ class Monomer(PureSubstance, Schema):
         Populates the `pure_substance` section with data from PubChem based on the
         `smiles` quantity.
 
-        Resets the `archive.results.material` section with the monomer name, if
-        provided.
-
-        Generates a 3D visualization of the monomer if atomic positions are available
-        from the xTB features.
+        Resets the `archive.results.material` section based on `pure_substance` and
+        `xtb_features`. Populating `archive.results.material.topology` creates a
+        visualization of the monomer in the material card.
         """
-        if not self.name:
-            self.name = 'Monomer'
 
         # reset `archive.results.material` section to be repopulated from
         # `PureSubstance` normalization
         if archive.results and archive.results.material:
             archive.results.material = None
         archive.m_setdefault('results.material')
-        if self.name != 'Monomer':
-            archive.results.material.material_name = self.name
 
-        self.components = []
         self.elemental_composition = []
-        pure_substance = None
         if self.smiles:
             # Use URL-encoded SMILES to handle special characters properly when
             # fetching from PubChem. Can be removed once `PubChemPureSubstanceSection`
@@ -393,8 +385,12 @@ class Monomer(PureSubstance, Schema):
             )
             pure_substance.normalize(archive, logger)
             pure_substance.smile = self.smiles
-        if pure_substance:
+
             self.pure_substance = pure_substance
+            if self.pure_substance.name:
+                archive.results.material.material_name = self.pure_substance.name
+                if not self.name:
+                    self.name = self.pure_substance.name
 
         self.populate_topology(archive, logger)
 

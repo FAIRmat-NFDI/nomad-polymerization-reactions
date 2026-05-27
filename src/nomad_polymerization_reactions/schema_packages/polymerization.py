@@ -485,7 +485,7 @@ class PolymerizationReaction(Activity, Schema):
                 'Will search in published entries.'
             )
             search_result = search(
-                owner='published',
+                owner='public',
                 query={
                     'data.smiles#nomad_polymerization_reactions.schema_packages.'
                     'polymerization.Monomer': smiles,

@@ -473,22 +473,38 @@ class PolymerizationReaction(Activity, Schema):
             owner='visible',
             query={
                 'data.smiles#nomad_polymerization_reactions.schema_packages.'
-                'polymerization.Monomer': smiles
+                'polymerization.Monomer': smiles,
+                'upload_id': archive.metadata.upload_id,  # limit search to same upload
             },
             user_id=archive.metadata.main_author.user_id,
         ).data
 
         if not search_result:
-            logger.warning(f'No monomer found with the SMILES "{smiles}".')
+            logger.info(
+                f'No monomer entry with the SMILES "{smiles}" found in current upload. '
+                'Will search in published entries.'
+            )
+            search_result = search(
+                owner='public',
+                query={
+                    'data.smiles#nomad_polymerization_reactions.schema_packages.'
+                    'polymerization.Monomer': smiles,
+                },
+                user_id=archive.metadata.main_author.user_id,
+            ).data
+
+        if not search_result:
+            logger.info(
+                f'No monomer entry with the SMILES "{smiles}" found in published '
+                'entries.'
+            )
             return None
 
         if len(search_result) > 1:
             logger.warning(
                 f'Multiple monomers found with the SMILES "{smiles}". Using the '
-                'first one.'
+                f'first one with entry_id "{search_result[0]["entry_id"]}".'
             )
-            # TODO: better handling in case of multiple entries?
-            # Limit to the same upload?
 
         upload_id = search_result[0]['upload_id']
         entry_id = search_result[0]['entry_id']

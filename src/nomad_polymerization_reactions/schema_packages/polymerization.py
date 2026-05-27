@@ -370,16 +370,12 @@ class Monomer(PureSubstance, Schema):
         Generates a 3D visualization of the monomer if atomic positions are available
         from the xTB features.
         """
-        if not self.name:
-            self.name = 'Monomer'
 
         # reset `archive.results.material` section to be repopulated from
         # `PureSubstance` normalization
         if archive.results and archive.results.material:
             archive.results.material = None
         archive.m_setdefault('results.material')
-        if self.name != 'Monomer':
-            archive.results.material.material_name = self.name
 
         self.components = []
         self.elemental_composition = []
@@ -395,6 +391,10 @@ class Monomer(PureSubstance, Schema):
             pure_substance.smile = self.smiles
         if pure_substance:
             self.pure_substance = pure_substance
+            if self.pure_substance.name:
+                archive.results.material.material_name = self.pure_substance.name
+                if not self.name:
+                    self.name = self.pure_substance.name
 
         self.populate_topology(archive, logger)
 

@@ -6,7 +6,7 @@ utilities. The plugin has been primarily developed for hosting polymerization da
 ## Availability
 
 The plugin is available on the central NOMAD deployment. You can use the
-Polymerization Reaction [search app][nomad-prod-polymerization-search] to
+[polymerization search app][nomad-prod-polymerization-search] to
 access entries from publicly available datasets. These entries
 are based on the [`PolymerizationReaction`][nomad-prod-metainfo-browser] schema
 defined in this plugin.

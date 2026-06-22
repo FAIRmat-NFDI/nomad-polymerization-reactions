@@ -42,36 +42,26 @@ a new Oasis, read the [installation guide][oasis-install].
 The package provides utility functions for transforming JSON files into NOMAD
 entry archives. These archives have `archive.json` ending and are processed by
 NOMAD once uploaded. The `m_def` key in the archives helps NOMAD to identify
-which data schema to use.
+which data schema to use (defined in
+[schema_packages / polymerization.py][schema-packages-polymerization]).
 
-Here's how you can convert a JSON file into an NOMAD entry archive that uses
-`nomad_polymerization_reactions.schema_packages.polymerization.Monomer` schema:
+Here's how you can convert a JSON file(s) into NOMAD entry archive(s) using the
+CLI command `nomad-polymerization archive`:
 
 ```bash
+# create an archive with `Monomer` schema
 nomad-polymerization archive monomer.json
-```
 
-If you want to create an archive that uses the `PolymerizationReaction`
-schema, use the `polymerization` mode:
-
-```bash
+# create an archive with `PolymerizationReaction` schema
 nomad-polymerization archive polymerization_reaction.json --mode polymerization
-```
 
-You can specify multiple filepaths in the same command or even use directory
-paths. All the `.json` files in the directory will be transformed into archives:
+# provide multiple filepaths or directory paths to convert multiple JSONs
+nomad-polymerization archive /folder/poly1.json /folder/poly2.json  --mode polymerization
+nomad-polymerization archive /folder --mode polymerization
 
-```bash
-nomad-polymerization archive /folder/polymerization/ --mode polymerization
-```
-
-By default, the command will create the archives in the same directory where it
-runs. If you want to create them in the same directory as the JSON file, use
-the flag `--same-dir`:
-
-```bash
-nomad-polymerization archive /folder/sub-folder/monomer.json --same-dir
-# creates `monomer.archive.json` file in `/folder/sub-folder/`
+# By default, the command creates archives in the current working directory. To create archives
+# in the same directory as the JSONs, use `same-dir` flag:
+nomad-polymerization archive /folder/monomer.json --same-dir
 ```
 
 The JSON files used for transformation should have a fixed format.
@@ -79,8 +69,7 @@ You can find the data models for JSON files in [models.py][models-py].
 
 ### License
 
-Distributed under the terms of the `Apache Software License 2.0` license,
-`nomad-polymerization-reactions` is free and open source software.
+Apache 2.0 - see [LICENSE][license].
 
 [nomad-prod-polymerization-search]: https://nomad-lab.eu/prod/v1/gui/search/polymerization
 [nomad-prod-metainfo-browser]: https://nomad-lab.eu/prod/v1/gui/analyze/metainfo/nomad_polymerization_reactions/section_definitions@nomad_polymerization_reactions.schema_packages.polymerization.PolymerizationReaction
@@ -88,4 +77,6 @@ Distributed under the terms of the `Apache Software License 2.0` license,
 [nomad-oasis]: https://nomad-lab.eu/prod/v1/docs/reference/glossary.html#deployment-nomad-oasis
 [plugin-docs]: https://nomad-lab.eu/prod/v1/docs/howto/oasis/configure.html#plugins
 [oasis-install]: https://nomad-lab.eu/prod/v1/docs/howto/oasis/install.html#how-to-install-a-nomad-oasis
+[schema-packages-polymerization]: https://github.com/FAIRmat-NFDI/nomad-polymerization-reactions/blob/main/src/nomad_polymerization_reactions/schema_packages/polymerization.py
 [models-py]: https://github.com/FAIRmat-NFDI/nomad-polymerization-reactions/blob/main/src/nomad_polymerization_reactions/models.py
+[license]: https://github.com/FAIRmat-NFDI/nomad-polymerization-reactions/blob/main/LICENSE

@@ -1,8 +1,7 @@
 # nomad-polymerization-reactions
 
 A NOMAD plugin providing schemas, search apps, and data transformation
-utilities. The plugin has been primarily developed for curating extracted
-datasets from literature in NOMAD.
+utilities. The plugin has been primarily developed for hosting polymerization datasets extracted from the literature in a NOMAD deployment.
 
 ## Availability
 

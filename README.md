@@ -1,7 +1,5 @@
 # nomad-polymerization-reactions
 
-![nomad-polymerization-reactions logo](logo.png)
-
 A NOMAD plugin providing schemas, search apps, and data transformation
 utilities. The plugin has been primarily developed for curating extracted
 datasets from literature in NOMAD.
@@ -67,7 +65,7 @@ nomad-polymerization archive /folder/monomer.json --same-dir
 The JSON files used for transformation should have a fixed format.
 You can find the data models for JSON files in [models.py][models-py].
 
-### License
+## License
 
 Apache 2.0 - see [LICENSE][license].
 

@@ -7,7 +7,6 @@ classifiers = [
     "Intended Audience :: Developers",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -19,13 +18,10 @@ dynamic = ["version"]
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
-    { name = "Pepe Márquez", email = "jose.marquez@physik.hu-berlin.de" },
-    { name = "Sarthak Kapoor", email = "sarthakkapoor@hotmail.com"},
+    { name = "Pepe Márquez"},
+    { name = "Sarthak Kapoor"},
 ]
-maintainers = [
-    { name = "Pepe Márquez", email = "jose.marquez@physik.hu-berlin.de" },
-    { name = "Sarthak Kapoor", email = "sarthakkapoor@hotmail.com"},
-]
+maintainers = [{ name = "FAIRmat", email = "fairmat@physik.hu-berlin.de" }]
 license = { file = "LICENSE" }
 dependencies = [
     "ase>=3.25.0",

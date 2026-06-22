@@ -3,15 +3,22 @@
 ![nomad-polymerization-reactions logo](logo.png)
 
 A NOMAD plugin providing schemas, search apps, and data transformation
-utilities for polymerization data extracted from publications.
+utilities. The plugin has been primarily developed for curating extracted
+datasets from literature in NOMAD.
 
 ## Availability
 
 The plugin is available on the central NOMAD deployment. You can use the
 Polymerization Reaction [search app][nomad-prod-polymerization-search] to
-access polymerization entries from publically available datasets. These entries
+access entries from publicly available datasets. These entries
 are based on the [`PolymerizationReaction`][nomad-prod-metainfo-browser] schema
-made available from this plugin.
+defined in this plugin.
+
+## Associated Work
+
+The dataset curated using this plugin has been used in the
+[`copolymer-reactivity`][copol-reactivity] project to train machine-learning
+models for classifying copolymerization types.
 
 ## Installation
 

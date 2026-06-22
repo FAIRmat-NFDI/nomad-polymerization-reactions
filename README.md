@@ -12,6 +12,21 @@ access entries from publicly available datasets. These entries
 are based on the [`PolymerizationReaction`][nomad-prod-metainfo-browser] schema
 defined in this plugin.
 
+<picture>
+  <source
+    media="(prefers-color-scheme: dark)"
+    srcset="app_dark.gif"
+  >
+  <source
+    media="(prefers-color-scheme: light)"
+    srcset="app_light.gif"
+  >
+  <img
+    alt="Polymerization Reaction search app demo"
+    src="app_light.gif"
+  >
+</picture>
+
 ## Associated Work
 
 The dataset curated using this plugin has been used in the

@@ -1,7 +1,6 @@
 from typing import (
     TYPE_CHECKING,
 )
-from urllib.parse import quote
 
 import numpy as np
 from ase import Atoms
@@ -377,14 +376,8 @@ class Monomer(PureSubstance, Schema):
 
         self.elemental_composition = []
         if self.smiles:
-            # Use URL-encoded SMILES to handle special characters properly when
-            # fetching from PubChem. Can be removed once `PubChemPureSubstanceSection`
-            # implements URL encoding.
-            pure_substance = PubChemPureSubstanceSection(
-                smile=quote(self.smiles, safe='')
-            )
+            pure_substance = PubChemPureSubstanceSection(smile=self.smiles)
             pure_substance.normalize(archive, logger)
-            pure_substance.smile = self.smiles
 
             self.pure_substance = pure_substance
             if self.pure_substance.name:

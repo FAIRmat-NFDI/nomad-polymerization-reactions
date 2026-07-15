@@ -20,13 +20,13 @@ def test_polymerization_reaction():
     )
     assert entry_archive.data.monomers[0].name == 'Methacrylic acid'
 
+
 def test_monomer():
-    test_file = os.path.join(
-        'tests', 'data', 'test_monomer.archive.yaml'
-    )
+    test_file = os.path.join('tests', 'data', 'test_monomer.archive.yaml')
     entry_archive = parse(test_file)[0]
     normalize_all(entry_archive)
 
+    PUB_CHEM_CID_ACRYLONITRILE = 7855
     assert entry_archive.data.pure_substance.smile == 'C=CC#N'
-    assert entry_archive.data.pure_substance.pub_chem_cid == 7855
+    assert entry_archive.data.pure_substance.pub_chem_cid == PUB_CHEM_CID_ACRYLONITRILE
     assert entry_archive.data.name == 'Acrylonitrile'

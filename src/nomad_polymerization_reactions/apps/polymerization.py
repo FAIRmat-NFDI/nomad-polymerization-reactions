@@ -197,11 +197,8 @@ polymerization_app = App(
         ],
     ),
     dashboard=Dashboard(
-        # SM: 6x12 grid
-        # MD: 9x18 grid
-        # LG: 12x24 grid
-        # XL: 15x30 grid
-        # XXL: 18x36 grid
+        # Grid columns: SM=12, MD=18, LG=24, XL=30, XXL=36.
+        # The number of rows is unrestricted.
         widgets=[
             WidgetHistogram(
                 title='Reaction Temperature Distribution',
@@ -216,8 +213,8 @@ polymerization_app = App(
                     BreakpointEnum.XXL: Layout(h=9, w=18, y=0, x=0),
                     BreakpointEnum.XL: Layout(h=8, w=15, y=0, x=0),
                     BreakpointEnum.LG: Layout(h=6, w=12, y=0, x=0),
-                    BreakpointEnum.MD: Layout(h=8, w=18, y=0, x=0),
-                    BreakpointEnum.SM: Layout(h=6, w=12, y=0, x=0),
+                    BreakpointEnum.MD: Layout(h=6, w=18, y=0, x=0, minH=6, minW=18),
+                    BreakpointEnum.SM: Layout(h=9, w=12, y=0, x=0, minH=9, minW=12),
                 },
             ),
             WidgetTerms(
@@ -229,8 +226,8 @@ polymerization_app = App(
                     BreakpointEnum.XXL: Layout(h=9, w=9, y=0, x=18),
                     BreakpointEnum.XL: Layout(h=8, w=8, y=0, x=15),
                     BreakpointEnum.LG: Layout(h=6, w=6, y=0, x=12),
-                    BreakpointEnum.MD: Layout(h=8, w=9, y=8, x=0),
-                    BreakpointEnum.SM: Layout(h=6, w=12, y=6, x=0),
+                    BreakpointEnum.MD: Layout(h=6, w=18, y=6, x=0, minH=6, minW=18),
+                    BreakpointEnum.SM: Layout(h=8, w=12, y=9, x=0, minH=8, minW=12),
                 },
             ),
             WidgetTerms(
@@ -240,10 +237,10 @@ polymerization_app = App(
                     BreakpointEnum.XXL: Layout(h=9, w=9, y=0, x=27),
                     BreakpointEnum.XL: Layout(h=8, w=7, y=0, x=23),
                     BreakpointEnum.LG: Layout(h=6, w=6, y=0, x=18),
-                    BreakpointEnum.MD: Layout(h=8, w=9, y=8, x=9),
-                    BreakpointEnum.SM: Layout(h=6, w=12, y=12, x=0),
+                    BreakpointEnum.MD: Layout(h=6, w=18, y=12, x=0, minH=6, minW=18),
+                    BreakpointEnum.SM: Layout(h=8, w=12, y=17, x=0, minH=8, minW=12),
                 },
             ),
-        ]
+        ],
     ),
 )
